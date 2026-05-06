@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function VideoPage() {
   const categories = ['전체보기', '정기공연', '오픈마이크', '페스티벌', '합주일상'];
-  
+
   const videos = [
     {
       id: 1,
@@ -65,7 +65,7 @@ export default function VideoPage() {
       <section className="relative pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1470229722913-7c090be434f0?q=80&w=2056&auto=format&fit=crop')] bg-cover bg-center"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A103D]/80 via-[#0A103D]/95 to-[#0A103D] z-0"></div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center animate-fade-in-up">
           <span className="text-accent font-bold tracking-widest text-sm mb-4 block">MEDIA GALLERY</span>
           <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
@@ -79,17 +79,16 @@ export default function VideoPage() {
 
       {/* Main Content */}
       <section className="max-w-7xl mx-auto px-6 pb-24 relative z-10">
-        
+
         {/* Filter Navigation */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           {categories.map((category, idx) => (
-            <button 
+            <button
               key={idx}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                idx === 0 
-                  ? 'bg-accent text-primary-dark font-bold' 
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${idx === 0
+                  ? 'bg-accent text-primary-dark font-bold'
                   : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10'
-              }`}
+                }`}
             >
               {category}
             </button>
@@ -100,18 +99,18 @@ export default function VideoPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {videos.map((video) => (
             <div key={video.id} className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-2xl hover:border-white/20 transition-all duration-500">
-              
+
               {/* Thumbnail Container */}
               <div className="relative aspect-video overflow-hidden cursor-pointer">
                 {/* Background Image */}
-                <div 
+                <div
                   className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
                   style={{ backgroundImage: `url('${video.thumbnail}')` }}
                 ></div>
-                
+
                 {/* Dark Overlay */}
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500"></div>
-                
+
                 {/* Duration Badge */}
                 <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded backdrop-blur-sm shadow-sm opacity-90">
                   {video.duration}
