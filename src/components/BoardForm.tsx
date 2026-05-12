@@ -15,9 +15,10 @@ interface BoardFormProps {
     author: string;
   };
   isEdit?: boolean;
+  category?: string;
 }
 
-export default function BoardForm({ initialData, isEdit = false }: BoardFormProps) {
+export default function BoardForm({ initialData, isEdit = false, category = 'free' }: BoardFormProps) {
   const router = useRouter();
   const { user, isLoaded } = useAuth();
   
@@ -38,10 +39,6 @@ export default function BoardForm({ initialData, isEdit = false }: BoardFormProp
       return;
     }
 
-    if (user.level < UserLevel.MEMBER) {
-      alert('게시글 작성은 정회원부터 가능합니다. 관리자에게 승인을 요청하세요.');
-      return;
-    }
 
     setIsLoading(true);
 
@@ -64,7 +61,7 @@ export default function BoardForm({ initialData, isEdit = false }: BoardFormProp
             title: formData.title,
             content: formData.content,
             author: user.nickname,
-            category: 'free' // 기본 일반 게시판
+            category: category
           }])
           .select()
           .single();

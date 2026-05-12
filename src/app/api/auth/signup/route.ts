@@ -4,9 +4,9 @@ import { db } from '@/lib/store';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, nickname, position } = body;
+    const { email, password, nickname, name, phone, bandName, position, address } = body;
 
-    if (!email || !password || !nickname) {
+    if (!email || !password || !name || !phone || !position || !address) {
       return NextResponse.json({ error: '필수 항목을 모두 입력해주세요.' }, { status: 400 });
     }
 
@@ -14,8 +14,12 @@ export async function POST(request: Request) {
       const newUser = db.addUser({
         email,
         password,
-        nickname,
-        position: position || '보컬'
+        nickname: nickname || name, // 닉네임이 없으면 본명으로
+        name,
+        phone,
+        bandName: bandName || '소속 없음', // 밴드명 입력 없으면 기본값
+        position,
+        address
       });
       // 성공적으로 가입 (비밀번호는 제외하고 반환)
       const { password: _, ...userWithoutPassword } = newUser;

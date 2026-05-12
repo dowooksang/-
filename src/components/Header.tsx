@@ -57,7 +57,7 @@ export default function Header() {
       label: '커뮤니티',
       subItems: [
         { href: '/board', label: '자유게시판 (통합)', icon: '💬' },
-        { href: '/board?category=promotion', label: '소속 밴드 홍보', icon: '🎸' },
+        { href: '/board?category=promotion', label: '소속 동호회(클럽) 홍보', icon: '🎸' },
         { href: '/board?category=market', label: '악기/장비 장터', icon: '🛒' },
         { href: '/board?category=archive', label: '활동 자료실', icon: '📁' },
         { href: '/board?category=qa', label: '건의 및 Q&A', icon: '❓' }
@@ -83,18 +83,29 @@ export default function Header() {
     },
   ];
 
-  const navLinks = user?.level === UserLevel.ADMIN 
-    ? [...baseNavLinks, {
-        href: '/admin',
-        label: '[관리자 전용]',
-        subItems: [
-          { href: '/admin/dashboard', label: '워드프레스 대시보드 바로가기', icon: '⚙️' },
-          { href: '/admin/posts', label: '망보드 게시물 통합 관리', icon: '📝' },
-          { href: '/admin/branches', label: '지부 가입 신청 현황 확인', icon: '🏢' },
-          { href: '/admin/stats', label: '사이트 통계 (방문자 수)', icon: '📊' }
-        ]
-      }]
-    : baseNavLinks;
+  const navLinks = [
+    ...baseNavLinks,
+    ...(user && user.level >= UserLevel.MASTER ? [{
+      href: '/network',
+      label: '[네트워크 협력·축제 보드]',
+      subItems: [
+        { href: '/network/festivals', label: '전국 음악 축제 DB', icon: '🎵' },
+        { href: '/network/guide', label: '연합회 공동 기획 가이드', icon: '📑' },
+        { href: '/network/sponsorship', label: '기업 후원 매칭 현황', icon: '🤝' }
+      ]
+    }] : []),
+    ...(user && user.level === UserLevel.ADMIN ? [{
+      href: '/admin',
+      label: '[시스템 관리자 전용]',
+      subItems: [
+        { href: '/admin/dashboard', label: '워드프레스 대시보드 바로가기', icon: '⚙️' },
+        { href: '/admin/members', label: '회원 목록 및 가입 승인', icon: '👥' },
+        { href: '/admin/posts', label: '망보드 게시물 통합 관리', icon: '📝' },
+        { href: '/admin/branches', label: '지부 가입 신청 현황 확인', icon: '🏢' },
+        { href: '/admin/stats', label: '사이트 통계 (방문자 수)', icon: '📊' }
+      ]
+    }] : [])
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-primary text-white shadow-xl border-b-2 border-accent relative">

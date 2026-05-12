@@ -47,7 +47,11 @@ export default function SignupPage() {
           email: formData.email,
           password: formData.password,
           nickname: formData.name, // Mock API needs nickname
-          position: formData.instrument
+          name: formData.name,
+          phone: formData.phone,
+          bandName: formData.bandName || '소속 없음',
+          position: formData.instrument,
+          address: formData.region
         })
       });
 
@@ -84,107 +88,55 @@ export default function SignupPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* 섹션 1: 개인 기본 정보 */}
           <div className="bg-white/5 p-6 rounded-xl border border-white/10 space-y-5">
-            <h3 className="text-accent font-bold border-b border-white/10 pb-2 mb-4">항목 1: 개인 기본 정보</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <h3 className="text-accent font-bold border-b border-white/10 pb-2 mb-4">필수 가입 정보</h3>
+            <div className="grid grid-cols-1 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">이메일</label>
-                <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="example@jb-band.org" />
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">이메일 (로그인 아이디)</label>
+                <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="example@jb-band.org" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">비밀번호</label>
-                <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="••••••••" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">비밀번호</label>
+                  <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="••••••••" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">비밀번호 확인</label>
+                  <input type="password" required value={formData.passwordConfirm} onChange={(e) => setFormData({...formData, passwordConfirm: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="••••••••" />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">성함 (실명)</label>
-                <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="홍길동" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">생년월일</label>
-                <input type="date" required value={formData.birthDate} onChange={(e) => setFormData({...formData, birthDate: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">연락처</label>
-                <input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="010-0000-0000" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">거주 지역</label>
-                <input type="text" required value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="예: 서울 서초구" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">1. 성함 (본명)</label>
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="홍길동" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">2. 연락처</label>
+                  <input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="010-0000-0000" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">3. 악기 파트</label>
+                  <select value={formData.instrument} onChange={(e) => setFormData({...formData, instrument: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent">
+                    <option value="보컬">보컬</option>
+                    <option value="기타">기타</option>
+                    <option value="베이스">베이스</option>
+                    <option value="드럼">드럼</option>
+                    <option value="키보드">키보드/신디</option>
+                    <option value="관악/현악/기타">관악/현악 등</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">4. 활동 지역</label>
+                  <input type="text" required value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-1 focus:ring-accent" placeholder="예: 서울 서초구" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 섹션 2: 아티스트 성향 */}
-          <div className="bg-white/5 p-6 rounded-xl border border-white/10 space-y-5">
-            <h3 className="text-accent font-bold border-b border-white/10 pb-2 mb-4">항목 2: 아티스트 성향</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">주요 악기</label>
-                <select value={formData.instrument} onChange={(e) => setFormData({...formData, instrument: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent">
-                  <option value="보컬">보컬</option>
-                  <option value="일렉기타">일렉기타</option>
-                  <option value="베이스">베이스</option>
-                  <option value="드럼">드럼</option>
-                  <option value="키보드">키보드/신디</option>
-                  <option value="관악/현악">관악/현악 등</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">활동 유형</label>
-                <select value={formData.activityType} onChange={(e) => setFormData({...formData, activityType: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent">
-                  <option value="개인(취미)">개인(취미)</option>
-                  <option value="밴드 소속">밴드 소속</option>
-                  <option value="전문 연주자">전문 연주자</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">선호 장르</label>
-                <input type="text" value={formData.genre} onChange={(e) => setFormData({...formData, genre: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="예: 락, 팝, 재즈" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">활동 경력</label>
-                <select value={formData.experience} onChange={(e) => setFormData({...formData, experience: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent">
-                  <option value="신입">신입 (1년 미만)</option>
-                  <option value="1~3년">1~3년</option>
-                  <option value="3~5년">3~5년</option>
-                  <option value="5년 이상">5년 이상</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* 섹션 3: 밴드 소속 정보 */}
-          <div className="bg-white/5 p-6 rounded-xl border border-white/10 space-y-5">
-            <h3 className="text-accent font-bold border-b border-white/10 pb-2 mb-4">항목 3: 밴드 소속 정보 (선택)</h3>
-            <p className="text-xs text-gray-400 mb-2">현재 소속되거나 결성 예정인 밴드가 있다면 기재해 주세요.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">밴드명</label>
-                <input type="text" value={formData.bandName} onChange={(e) => setFormData({...formData, bandName: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="밴드 이름" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">주요 연습 지역</label>
-                <input type="text" value={formData.practiceRegion} onChange={(e) => setFormData({...formData, practiceRegion: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent" placeholder="예: 홍대, 강남" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">밴드 내 역할</label>
-                <select value={formData.bandRole} onChange={(e) => setFormData({...formData, bandRole: e.target.value})} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-accent">
-                  <option value="">선택안함</option>
-                  <option value="팀장(마스터)">팀장(마스터)</option>
-                  <option value="총무">총무</option>
-                  <option value="일반 멤버">일반 멤버</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* 섹션 4: 동의 항목 */}
-          <div className="bg-white/5 p-6 rounded-xl border border-white/10 space-y-3">
-            <h3 className="text-accent font-bold border-b border-white/10 pb-2 mb-4">항목 4: 사단법인 관련 동의</h3>
+          <div className="bg-white/5 p-4 rounded-xl border border-white/10">
             <label className="flex items-start gap-3 cursor-pointer group">
               <input type="checkbox" required checked={formData.agreePrivacy} onChange={(e) => setFormData({...formData, agreePrivacy: e.target.checked})} className="mt-1 w-4 h-4 rounded bg-black/20 border-gray-500 text-accent focus:ring-accent" />
-              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">[필수] 개인정보 수집 및 이용, 연합회 공식 행사 알림 수신에 동의합니다.</span>
+              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">5. [필수] 가입 후 관리자 승인 전까지 일부 이용이 제한됨을 확인합니다.</span>
             </label>
           </div>
 

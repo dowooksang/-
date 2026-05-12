@@ -12,7 +12,12 @@ export interface User {
   email: string;
   password?: string; // 실제로는 Hash 해야 함
   nickname: string;
-  position: string; // 보컬, 기타 등
+  name: string; // 이름
+  phone: string; // 연락처
+  bandName: string; // 소속 동호회(클럽)명
+  position: string; // 악기 파트
+  address: string; // 주소
+  status: 'pending' | 'active'; // 승인 상태
   level: UserLevel;
   createdAt: string;
 }
@@ -34,7 +39,12 @@ let users: User[] = [
     email: "dowooksang@gmail.com",
     password: "admin", // 임시
     nickname: "연합회장",
+    name: "도욱상",
+    phone: "010-0000-0000",
+    bandName: "운영진",
     position: "운영진",
+    address: "서울시 강남구",
+    status: 'active',
     level: UserLevel.ADMIN,
     createdAt: new Date().toISOString(),
   }
@@ -49,7 +59,7 @@ export const db = {
   getUserByEmail: (email: string) => users.find(u => u.email === email) || null,
   getUserById: (id: string) => users.find(u => u.id === id) || null,
   
-  addUser: (userData: Omit<User, 'id' | 'level' | 'createdAt'>) => {
+  addUser: (userData: Omit<User, 'id' | 'level' | 'status' | 'createdAt'>) => {
     // 이메일 중복 체크
     if (users.find(u => u.email === userData.email)) {
       throw new Error('이미 존재하는 이메일입니다.');
@@ -58,10 +68,39 @@ export const db = {
       ...userData,
       id: Math.random().toString(36).substring(2, 9),
       level: UserLevel.GUEST, // 기본값: 준회원
+      status: 'pending', // 기본값: 대기 상태
       createdAt: new Date().toISOString()
     };
     users.push(newUser);
     return newUser;
+  },
+
+  approveUser: (id: string) => {
+    const user = users.find(u => u.id === id);
+    if (user) {
+      user.status = 'active';
+      user.level = UserLevel.MEMBER; // 승인되면 정회원으로 등급업
+      return true;
+    }
+    return false;
+  },
+
+  appointAdmin: (id: string) => {
+    const user = users.find(u => u.id === id);
+    if (user) {
+      user.level = UserLevel.ADMIN;
+      return true;
+    }
+    return false;
+  },
+
+  dismissAdmin: (id: string) => {
+    const user = users.find(u => u.id === id);
+    if (user && user.level === UserLevel.ADMIN) {
+      user.level = UserLevel.MEMBER; // 관리자 해임 시 정회원으로 강등
+      return true;
+    }
+    return false;
   },
 
   // --------- 게시글 관리 (Posts) ---------
@@ -96,5 +135,48 @@ export const db = {
     if (index === -1) return false;
     posts.splice(index, 1);
     return true;
+  },
+
+  // --------- 지부 관리 (Branches) ---------
+  getBranches: () => [...branches],
+  
+  addBranch: (branchData: Omit<Branch, 'id' | 'status' | 'createdAt'>) => {
+    const newBranch: Branch = {
+      ...branchData,
+      id: Math.random().toString(36).substring(2, 9),
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    branches.push(newBranch);
+    return newBranch;
+  },
+  
+  approveBranch: (id: string) => {
+    const branch = branches.find(b => b.id === id);
+    if (branch) {
+      branch.status = 'approved';
+      // 지부장의 UserLevel을 밴드마스터(지부장) 등급으로 상향
+      const user = users.find(u => u.id === branch.userId);
+      if (user && user.level < UserLevel.MASTER) {
+        user.level = UserLevel.MASTER;
+      }
+      return true;
+    }
+    return false;
   }
 };
+
+export interface Branch {
+  id: string;
+  name: string; // 지부 명칭
+  managerName: string; // 지부장 성함
+  managerPhone: string; // 지부장 연락처
+  region: string; // 활동 지역
+  hasPracticeRoom: boolean; // 연습실 유무
+  bandCount: number; // 소속 밴드 수
+  status: 'pending' | 'approved';
+  userId: string; // 신청자 고유 ID
+  createdAt: string;
+}
+
+let branches: Branch[] = [];
