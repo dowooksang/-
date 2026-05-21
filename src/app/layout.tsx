@@ -46,7 +46,7 @@ export default function RootLayout({
               </div>
               <p className="text-sm text-gray-400">법인명: 사단법인직장인밴드연합회 | 대표자: 도욱상 | 고유번호: 미정</p>
               <p className="text-sm text-gray-400">주소: 서초구 효령로4길 566-16</p>
-              <p className="text-sm text-gray-400">연락처: 010-5340-9881 | 이메일: dowooksang@gmail.com</p>
+              <p className="text-sm text-gray-400">이메일: dowooksang@gmail.com</p>
               <div className="text-xs text-gray-500 mt-4">
                 © {new Date().getFullYear()} 직장인밴드연합회. All rights reserved.
               </div>
