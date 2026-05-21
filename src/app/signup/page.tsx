@@ -40,29 +40,31 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          nickname: formData.name, // Mock API needs nickname
-          name: formData.name,
-          phone: formData.phone,
-          bandName: formData.bandName || '소속 없음',
-          position: formData.instrument,
-          address: formData.region
-        })
+      // 대표님 이메일인 경우 자동으로 최고 권한(LV6) 부여
+      const isMaster = formData.email === 'dowooksang@gmail.com';
+      const assignedLevel = isMaster ? 6 : 1; // 6: 대표이사, 1: 준회원
+
+      // Supabase 실제 회원가입 호출
+      const { data, error: signUpError } = await import('@/lib/supabase').then(m => m.supabase).auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            phone: formData.phone,
+            bandName: formData.bandName || '소속 없음',
+            position: formData.instrument,
+            address: formData.region,
+            level: assignedLevel, // 핵심: 여기서 레벨을 부여함
+          }
+        }
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || '회원가입에 실패했습니다.');
+      if (signUpError) {
+        throw new Error(signUpError.message);
       }
 
-      // 회원가입 성공 시 자동 로그인
-      login(data);
+      // 회원가입 성공 시 메인으로 이동 (Supabase가 자동 로그인 세션을 만들어줌)
       router.push('/');
       router.refresh();
       

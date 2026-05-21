@@ -22,19 +22,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const { data, error: signInError } = await import('@/lib/supabase').then(m => m.supabase).auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || '로그인에 실패했습니다.');
+      if (signInError) {
+        throw new Error('이메일이나 비밀번호가 일치하지 않습니다.');
       }
 
-      login(data);
+      // 로그인 성공 시 메인 페이지로 이동
       router.push('/');
       router.refresh();
       
