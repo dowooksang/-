@@ -1,10 +1,11 @@
-// 회원 등급 (5단계) 정의
+// 회원 등급 (6단계) 정의
 export enum UserLevel {
-  GUEST = 1,      // 준회원 (가입 직후)
-  MEMBER = 2,     // 정회원 (승인됨, 글쓰기 가능)
-  ACTIVE = 3,     // 활동회원
-  MASTER = 4,     // 밴드마스터
-  ADMIN = 5       // 최고관리자 (실운영진)
+  LV1_GUEST = 1,     // 준회원 (회원가입 직후)
+  LV2_MEMBER = 2,    // 정회원 (지부 인증 완료)
+  LV3_EXCELLENT = 3, // 우수회원 (활동 우수, 공동 행사 참여)
+  LV4_MANAGER = 4,   // 지부장급 (네트워크, 소속 회원 승인 권한)
+  LV5_ADMIN = 5,     // 관리자 (연합회 총괄 본부 스태프)
+  LV6_CEO = 6        // 대표이사 (최고 권한, 최종 의사결정)
 }
 
 export interface User {
@@ -45,7 +46,7 @@ let users: User[] = [
     position: "운영진",
     address: "서울시 강남구",
     status: 'active',
-    level: UserLevel.ADMIN,
+    level: UserLevel.LV6_CEO,
     createdAt: new Date().toISOString(),
   }
 ];
@@ -67,7 +68,7 @@ export const db = {
     const newUser: User = {
       ...userData,
       id: Math.random().toString(36).substring(2, 9),
-      level: UserLevel.GUEST, // 기본값: 준회원
+      level: UserLevel.LV1_GUEST, // 기본값: 준회원
       status: 'pending', // 기본값: 대기 상태
       createdAt: new Date().toISOString()
     };
@@ -79,7 +80,7 @@ export const db = {
     const user = users.find(u => u.id === id);
     if (user) {
       user.status = 'active';
-      user.level = UserLevel.MEMBER; // 승인되면 정회원으로 등급업
+      user.level = UserLevel.LV2_MEMBER; // 승인되면 정회원으로 등급업
       return true;
     }
     return false;
@@ -88,7 +89,7 @@ export const db = {
   appointAdmin: (id: string) => {
     const user = users.find(u => u.id === id);
     if (user) {
-      user.level = UserLevel.ADMIN;
+      user.level = UserLevel.LV5_ADMIN;
       return true;
     }
     return false;
@@ -96,8 +97,8 @@ export const db = {
 
   dismissAdmin: (id: string) => {
     const user = users.find(u => u.id === id);
-    if (user && user.level === UserLevel.ADMIN) {
-      user.level = UserLevel.MEMBER; // 관리자 해임 시 정회원으로 강등
+    if (user && user.level === UserLevel.LV5_ADMIN) {
+      user.level = UserLevel.LV2_MEMBER; // 관리자 해임 시 정회원으로 강등
       return true;
     }
     return false;
@@ -157,8 +158,8 @@ export const db = {
       branch.status = 'approved';
       // 지부장의 UserLevel을 밴드마스터(지부장) 등급으로 상향
       const user = users.find(u => u.id === branch.userId);
-      if (user && user.level < UserLevel.MASTER) {
-        user.level = UserLevel.MASTER;
+      if (user && user.level < UserLevel.LV4_MANAGER) {
+        user.level = UserLevel.LV4_MANAGER;
       }
       return true;
     }

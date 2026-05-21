@@ -59,19 +59,23 @@ export default function RootLayout({
                 <Link href="/about/contact" className="hover:text-white transition-colors">오시는길</Link>
               </div>
               <div className="flex gap-3 mt-2 md:mt-0 md:justify-end">
-                {/* SNS Icons placeholders */}
-                <div className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center cursor-pointer transition-colors">
+                {/* SNS Icons */}
+                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-[#1877F2]/20 hover:bg-[#1877F2] text-[#1877F2] hover:text-white flex items-center justify-center cursor-pointer transition-all shadow-sm">
                   <span className="sr-only">Facebook</span>
-                  F
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center cursor-pointer transition-colors">
+                  <span className="font-bold">F</span>
+                </a>
+                <a href="https://pf.kakao.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-[#FEE500]/20 hover:bg-[#FEE500] text-[#FEE500] hover:text-[#371D1E] flex items-center justify-center cursor-pointer transition-all shadow-sm">
+                  <span className="sr-only">KakaoTalk</span>
+                  <span className="font-bold text-[10px]">TALK</span>
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-[#E4405F]/20 hover:bg-gradient-to-tr hover:from-[#F58529] hover:via-[#DD2A7B] hover:to-[#8134AF] text-[#E4405F] hover:text-white flex items-center justify-center cursor-pointer transition-all shadow-sm">
                   <span className="sr-only">Instagram</span>
-                  I
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center cursor-pointer transition-colors">
+                  <span className="font-bold">I</span>
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-[#FF0000]/20 hover:bg-[#FF0000] text-[#FF0000] hover:text-white flex items-center justify-center cursor-pointer transition-all shadow-sm">
                   <span className="sr-only">YouTube</span>
-                  Y
-                </div>
+                  <span className="font-bold">Y</span>
+                </a>
               </div>
             </div>
           </div>

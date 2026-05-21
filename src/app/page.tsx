@@ -24,6 +24,27 @@ export default async function Home() {
         ></div>
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A103D]/90 via-[#0A103D]/60 to-[#0A103D] z-10"></div>
         
+        {/* Association Scale Bar */}
+        <div className="absolute top-0 w-full bg-gradient-to-r from-[#0A103D] via-[#1A2359] to-[#0A103D] border-b border-accent/30 py-3 backdrop-blur-md z-40 shadow-lg">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-24 text-sm md:text-base font-medium">
+            <div className="flex items-center gap-4 group cursor-default">
+              <span className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:scale-110 transition-transform">👥</span>
+              <div className="flex flex-col">
+                <span className="text-gray-400 text-xs tracking-wider uppercase">전국 총 회원 수</span>
+                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">12,504<span className="text-sm font-normal text-gray-300 ml-1">명</span></span>
+              </div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-white/10"></div>
+            <div className="flex items-center gap-4 group cursor-default">
+              <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(130,200,255,0.3)] group-hover:scale-110 transition-transform">🏢</span>
+              <div className="flex flex-col">
+                <span className="text-gray-400 text-xs tracking-wider uppercase">활성 지부 수</span>
+                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">42<span className="text-sm font-normal text-gray-300 ml-1">개 지부</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="relative z-20 text-center px-4 max-w-5xl mx-auto flex flex-col items-center animate-fade-in-up mt-16">
           <span className="px-5 py-2 rounded-full bg-accent/20 text-accent font-bold text-sm mb-6 border border-accent/40 tracking-[0.2em] shadow-[0_0_15px_rgba(130,200,255,0.3)]">
             A O W B · OFFICIAL WEBSITE
