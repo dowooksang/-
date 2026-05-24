@@ -64,8 +64,15 @@ export default function SignupPage() {
         throw new Error(signUpError.message);
       }
 
-      // 회원가입 성공 시 메인으로 이동 (Supabase가 자동 로그인 세션을 만들어줌)
-      router.push('/');
+      // 회원가입 성공 시
+      if (data.session) {
+        // 자동 로그인 된 경우
+        router.push('/');
+      } else {
+        // 이메일 인증이 필요한 경우
+        alert('가입이 완료되었습니다! (※ 만약 로그인이 안 된다면 Supabase 설정에서 "Confirm email"을 끄시거나, 가입하신 이메일의 메일함을 확인해주세요.)');
+        router.push('/login');
+      }
       router.refresh();
       
     } catch (err: any) {
