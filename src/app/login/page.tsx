@@ -22,14 +22,26 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { data, error: signInError } = await import('@/lib/supabase').then(m => m.supabase).auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
+      // API 라우트를 통해 로컬(In-Memory) 인증 시도
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (signInError) {
-        throw new Error('이메일이나 비밀번호가 일치하지 않습니다.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
       }
+
+      // useAuth의 login 함수 호출하여 클라이언트 상태 업데이트
+      login(data.user);
 
       // 로그인 성공 시 메인 페이지로 이동
       router.push('/');

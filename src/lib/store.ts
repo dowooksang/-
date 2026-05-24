@@ -65,11 +65,15 @@ export const db = {
     if (users.find(u => u.email === userData.email)) {
       throw new Error('이미 존재하는 이메일입니다.');
     }
+    
+    // 대표님 이메일이거나 admin인 경우 자동으로 최고 권한(CEO) 부여
+    const isOwner = userData.email.includes('dowooksang') || userData.email.includes('admin');
+    
     const newUser: User = {
       ...userData,
       id: Math.random().toString(36).substring(2, 9),
-      level: UserLevel.LV1_GUEST, // 기본값: 준회원
-      status: 'pending', // 기본값: 대기 상태
+      level: isOwner ? UserLevel.LV6_CEO : UserLevel.LV1_GUEST,
+      status: isOwner ? 'active' : 'pending',
       createdAt: new Date().toISOString()
     };
     users.push(newUser);
