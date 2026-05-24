@@ -41,7 +41,7 @@ export default function LoginPage() {
       }
 
       // useAuth의 login 함수 호출하여 클라이언트 상태 업데이트
-      login(data.user);
+      login(data);
 
       // 로그인 성공 시 메인 페이지로 이동
       router.push('/');
