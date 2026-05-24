@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/useAuth';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,26 +23,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // API 라우트를 통해 로컬(In-Memory) 인증 시도
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
+      if (signInError) {
+        throw new Error('이메일이나 비밀번호가 일치하지 않습니다.');
       }
-
-      // useAuth의 login 함수 호출하여 클라이언트 상태 업데이트
-      login(data);
 
       // 로그인 성공 시 메인 페이지로 이동
       router.push('/');
