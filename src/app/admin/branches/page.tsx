@@ -13,7 +13,7 @@ export default function AdminBranchesPage() {
 
   useEffect(() => {
     if (isLoaded) {
-      if (!user || user.level !== UserLevel.ADMIN) {
+      if (!user || user.level < UserLevel.LV5_ADMIN) {
         alert('관리자만 접근할 수 있습니다.');
         router.push('/');
         return;
@@ -74,35 +74,35 @@ export default function AdminBranchesPage() {
         </div>
         
         {pendingBranches.length === 0 ? (
-          <div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center text-gray-400">
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center text-gray-200">
             새로 들어온 지부 신청이 없습니다.
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {pendingBranches.map((b) => (
               <div key={b.id} className="bg-white/5 border border-white/10 rounded-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
                   승인 대기
                 </div>
                 <h3 className="text-xl font-bold mb-1 text-accent">{b.name}</h3>
-                <p className="text-sm text-gray-400 mb-4">{new Date(b.createdAt).toLocaleDateString()} 신청</p>
+                <p className="text-sm text-gray-200 font-medium mb-4">{new Date(b.createdAt).toLocaleDateString()} 신청</p>
                 
-                <div className="grid grid-cols-2 gap-y-3 text-sm mb-6 bg-black/20 p-4 rounded-lg">
-                  <div className="text-gray-400">지부장 성함</div>
-                  <div className="font-medium text-right">{b.managerName}</div>
+                <div className="grid grid-cols-2 gap-y-3 text-sm mb-6 bg-black/35 p-4 rounded-lg">
+                  <div className="text-gray-200 font-medium">지부장 성함</div>
+                  <div className="font-bold text-right text-white">{b.managerName}</div>
                   
-                  <div className="text-gray-400">연락처</div>
-                  <div className="font-medium text-right">{b.managerPhone}</div>
+                  <div className="text-gray-200 font-medium">연락처</div>
+                  <div className="font-bold text-right text-white">{b.managerPhone}</div>
                   
-                  <div className="text-gray-400">활동 지역</div>
-                  <div className="font-medium text-right">{b.region}</div>
+                  <div className="text-gray-200 font-medium">활동 지역</div>
+                  <div className="font-bold text-right text-white">{b.region}</div>
                   
-                  <div className="text-gray-400">소속 동호회 수</div>
-                  <div className="font-medium text-right">{b.bandCount}팀</div>
+                  <div className="text-gray-200 font-medium">소속 동호회 수</div>
+                  <div className="font-bold text-right text-white">{b.bandCount}팀</div>
                   
-                  <div className="text-gray-400">모임 공간 유무</div>
-                  <div className="font-medium text-right">
-                    {b.hasPracticeRoom ? <span className="text-green-400">보유함</span> : <span className="text-gray-500">미보유</span>}
+                  <div className="text-gray-200 font-medium">모임 공간 유무</div>
+                  <div className="font-bold text-right">
+                    {b.hasPracticeRoom ? <span className="text-green-300 font-bold">보유함</span> : <span className="text-gray-300 font-medium">미보유</span>}
                   </div>
                 </div>
 
@@ -130,25 +130,25 @@ export default function AdminBranchesPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 border-y border-white/10 text-sm text-gray-300">
-                <th className="p-4 font-semibold">지부 명칭</th>
-                <th className="p-4 font-semibold">지부장</th>
-                <th className="p-4 font-semibold">연락처</th>
-                <th className="p-4 font-semibold">활동 지역</th>
-                <th className="p-4 font-semibold text-center">동호회 수</th>
-                <th className="p-4 font-semibold text-center">모임 공간</th>
+              <tr className="bg-white/5 border-y border-white/10 text-sm text-gray-100">
+                <th className="p-4 font-bold text-accent">지부 명칭</th>
+                <th className="p-4 font-bold text-accent">지부장</th>
+                <th className="p-4 font-bold text-accent">연락처</th>
+                <th className="p-4 font-bold text-accent">활동 지역</th>
+                <th className="p-4 font-bold text-accent text-center">동호회 수</th>
+                <th className="p-4 font-bold text-accent text-center">모임 공간</th>
               </tr>
             </thead>
             <tbody>
               {approvedBranches.map((b) => (
                 <tr key={b.id} className="border-b border-white/5 hover:bg-white/5 transition-colors text-sm">
-                  <td className="p-4 font-bold text-accent">{b.name}</td>
-                  <td className="p-4">{b.managerName}</td>
-                  <td className="p-4 text-gray-300">{b.managerPhone}</td>
-                  <td className="p-4 text-gray-300">{b.region}</td>
-                  <td className="p-4 text-center text-gray-300">{b.bandCount}팀</td>
-                  <td className="p-4 text-center">
-                    {b.hasPracticeRoom ? 'O' : 'X'}
+                  <td className="p-4 font-extrabold text-accent text-base">{b.name}</td>
+                  <td className="p-4 font-bold text-white text-base">{b.managerName}</td>
+                  <td className="p-4 font-semibold text-gray-100">{b.managerPhone}</td>
+                  <td className="p-4 font-semibold text-gray-100">{b.region}</td>
+                  <td className="p-4 text-center font-semibold text-gray-100">{b.bandCount}팀</td>
+                  <td className="p-4 text-center font-bold text-white">
+                    {b.hasPracticeRoom ? <span className="text-green-300">O (보유)</span> : <span className="text-gray-400">X (미보유)</span>}
                   </td>
                 </tr>
               ))}

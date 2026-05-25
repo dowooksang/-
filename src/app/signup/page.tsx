@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuth';
-import { supabase } from '@/lib/supabase';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,52 +27,43 @@ export default function SignupPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+ 
     if (formData.password !== formData.passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.');
       return;
     }
-
+ 
     setIsLoading(true);
-
+ 
     try {
-      const isMaster = formData.email.includes('dowooksang') || formData.email.includes('admin');
-      const assignedLevel = isMaster ? 6 : 1; // 6: 대표이사, 1: 준회원
-
-      // Supabase 실제 회원가입 호출
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-            phone: formData.phone,
-            bandName: formData.bandName || '소속 없음',
-            position: formData.instrument,
-            address: formData.region,
-            level: assignedLevel, // 핵심: 여기서 레벨을 부여함
-          }
-        }
+      // 로컬 회원가입 API 호출
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phone,
+          bandName: formData.bandName || '소속 없음',
+          position: formData.instrument,
+          address: formData.region
+        })
       });
-
-      if (signUpError) {
-        throw new Error(signUpError.message);
+ 
+      const data = await res.json();
+ 
+      if (!res.ok) {
+        throw new Error(data.error || '회원가입 중 오류가 발생했습니다.');
       }
-
-      // 회원가입 성공 시
-      if (data.session) {
-        // 자동 로그인 된 경우
-        router.push('/');
-      } else {
-        // 이메일 인증이 필요한 경우
-        alert('가입이 완료되었습니다! (※ 만약 로그인이 안 된다면 Supabase 설정에서 "Confirm email"을 끄시거나, 가입하신 이메일의 메일함을 확인해주세요.)');
-        router.push('/login');
-      }
-      router.refresh();
+ 
+      // 회원가입 성공 시 프리미엄 웰컴 모달 활성화
+      setShowSuccessModal(true);
       
     } catch (err: any) {
       setError(err.message);
@@ -81,6 +71,7 @@ export default function SignupPage() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="bg-[#0A103D] min-h-screen text-white flex items-center justify-center py-12 px-6">
@@ -157,11 +148,43 @@ export default function SignupPage() {
             {isLoading ? '처리 중...' : '회원가입 완료'}
           </button>
         </form>
-
+ 
         <p className="mt-8 text-center text-sm text-gray-400">
           이미 계정이 있으신가요? <Link href="/login" className="text-accent hover:underline font-medium">로그인하기</Link>
         </p>
       </div>
+
+      {/* 프리미엄 웰컴 성공 모달 */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-lg bg-[#0A103D] border-2 border-accent/40 rounded-3xl p-8 md:p-10 text-center shadow-[0_0_50px_rgba(255,214,0,0.2)] animate-scale-in">
+            <div className="w-20 h-20 bg-accent/10 border-4 border-accent text-accent rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-[0_0_20px_rgba(255,214,0,0.3)] animate-bounce font-black">
+              ✓
+            </div>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">가입 신청 완료!</h3>
+            
+            <div className="space-y-4 text-left bg-white/5 border border-white/10 p-6 rounded-2xl text-base text-gray-300 mb-8 leading-relaxed font-semibold">
+              <p>
+                축하합니다! <span className="text-accent font-black text-lg">{formData.name}</span> 님의 가입 신청이 성공적으로 접수되었습니다.
+              </p>
+              <p className="text-sm text-gray-400 border-t border-white/10 pt-4 font-medium">
+                현재 계정은 <span className="text-white font-black text-sm bg-gray-700 px-2 py-0.5 rounded">준회원 (가입 대기)</span> 상태입니다. 최고관리자(<span className="text-accent font-black">도욱상 님</span>)의 가입 승인 처리 후 정회원으로 모든 서비스를 정상적으로 이용하실 수 있습니다.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                router.push('/login');
+                router.refresh();
+              }}
+              className="w-full bg-accent hover:bg-accent-hover text-[#0A103D] font-black py-4 rounded-xl text-lg shadow-lg hover:-translate-y-[1px] transition-all cursor-pointer"
+            >
+              로그인 화면으로 이동
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

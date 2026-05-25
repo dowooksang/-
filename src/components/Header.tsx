@@ -56,6 +56,7 @@ export default function Header() {
       href: '/community', 
       label: '커뮤니티',
       subItems: [
+        { href: '/board?category=greeting', label: '가입인사', icon: '👋' },
         { href: '/board', label: '자유게시판 (통합)', icon: '💬' },
         { href: '/board?category=promotion', label: '소속 동호회(클럽) 홍보', icon: '🎸' },
         { href: '/board?category=market', label: '악기/장비 장터', icon: '🛒' },

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { UserLevel } from '@/lib/store';
-import { supabase } from '@/lib/supabase';
 
 // 권한 라벨 변환 헬퍼 (6단계 버전)
 export const getLevelName = (level: UserLevel) => {
@@ -21,50 +20,46 @@ export function useAuth() {
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
-    // 1. 초기 세션 확인
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const meta = session.user.user_metadata || {};
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          level: meta.level || UserLevel.LV1_GUEST,
-          name: meta.name || '이름없음',
-          nickname: meta.name || '이름없음',
-          bandName: meta.bandName || '소속 없음',
-          status: 'active'
-        });
-      } else {
+    // 1. 로컬 세션 확인 및 실시간 동기화
+    const syncSession = async () => {
+      try {
+        const savedEmail = localStorage.getItem('jb_session_email');
+        if (savedEmail) {
+          // 최신 회원 정보 동기화를 위해 서버 API 호출
+          const res = await fetch(`/api/auth/me?email=${encodeURIComponent(savedEmail)}`);
+          if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+            localStorage.setItem('jb_session_email', userData.email);
+          } else {
+            // 서버에 존재하지 않는 이메일인 경우 (예: 서버 재기동으로 메모리 초기화)
+            localStorage.removeItem('jb_session_email');
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('세션 동기화 실패:', err);
         setUser(null);
+      } finally {
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
-    });
+    };
 
-    // 2. 로그인/로그아웃 상태 변화 실시간 감지
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const meta = session.user.user_metadata || {};
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          level: meta.level || UserLevel.LV1_GUEST,
-          name: meta.name || '이름없음',
-          nickname: meta.name || '이름없음',
-          bandName: meta.bandName || '소속 없음',
-          status: 'active'
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    syncSession();
   }, []);
 
-  const login = () => {}; // Supabase Auth는 이제 직접 로그인 함수를 호출합니다.
+  const login = (userData: any) => {
+    setUser(userData);
+    localStorage.setItem('jb_session_email', userData.email);
+  };
+
   const logout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('jb_session_email');
+    setUser(null);
   };
 
   return { user, isLoaded, login, logout };
 }
+

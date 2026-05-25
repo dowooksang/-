@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 
 const CATEGORY_NAMES: Record<string, { title: string, desc: string }> = {
   free: { title: '자유게시판', desc: '자유롭게 소통하는 공간입니다.' },
+  greeting: { title: '가입인사', desc: '새로 오신 회원님들의 가입인사 공간입니다.' },
   promotion: { title: '동호회(클럽) 홍보', desc: '소속 동호회나 클럽을 홍보해보세요.' },
   market: { title: '악기/장비 장터', desc: '중고 악기나 장비를 거래하는 공간입니다.' },
   archive: { title: '활동 자료실', desc: '다양한 활동 자료와 악보 등을 공유합니다.' },

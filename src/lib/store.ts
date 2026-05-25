@@ -108,6 +108,15 @@ export const db = {
     return false;
   },
 
+  changeUserLevel: (id: string, newLevel: UserLevel) => {
+    const user = users.find(u => u.id === id);
+    if (user) {
+      user.level = newLevel;
+      return true;
+    }
+    return false;
+  },
+
   // --------- 게시글 관리 (Posts) ---------
   // 전체 게시글 조회 (최신순 정렬)
   getPosts: () => [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),

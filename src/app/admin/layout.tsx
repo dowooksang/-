@@ -16,14 +16,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!user) {
         alert('로그인이 필요합니다.');
         router.push('/login');
-      } else if (user.level !== UserLevel.ADMIN) {
+      } else if (user.level < UserLevel.LV5_ADMIN) {
         alert('관리자 전용 페이지입니다.');
         router.push('/');
       }
     }
   }, [isLoaded, user, router]);
 
-  if (!isLoaded || !user || user.level !== UserLevel.ADMIN) {
+  if (!isLoaded || !user || user.level < UserLevel.LV5_ADMIN) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-500">권한 확인 중...</div>;
   }
 
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative z-0 h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col relative z-0 h-screen overflow-hidden bg-[#F8FAFC]">
         <header className="bg-white shadow-sm h-16 flex items-center px-8 flex-shrink-0 justify-between">
           <h1 className="text-lg font-bold text-gray-800">
             {menuItems.find(m => m.href === pathname)?.label || '관리자 페이지'}

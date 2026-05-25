@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/useAuth';
-import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,16 +22,25 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
       });
 
-      if (signInError) {
-        throw new Error('이메일이나 비밀번호가 일치하지 않습니다.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
       }
 
-      // 로그인 성공 시 메인 페이지로 이동
+      // 로그인 성공 시 로컬 세션 주입
+      login(data);
+
+      // 메인 페이지로 이동
       router.push('/');
       router.refresh();
       
@@ -42,6 +50,7 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="bg-[#0A103D] min-h-screen text-white flex items-center justify-center py-12 px-6">
@@ -65,12 +74,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* 안내 메시지 - 임시 테스트용 */}
-        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg mb-6 text-xs text-blue-200">
-          <strong className="text-blue-400">💡 관리자(테스트) 계정</strong><br/>
-          이메일: dowooksang@gmail.com<br/>
-          비밀번호: admin
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

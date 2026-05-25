@@ -1,103 +1,172 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
+
+const CATEGORY_MAP: Record<string, string> = {
+  greeting: '가입인사',
+  free: '자유게시판',
+  archive: '행정 자료실',
+  qa: '가입/협업 문의'
+};
 
 export default function CommunityPage() {
+  const [activeTab, setActiveTab] = useState<'greeting' | 'free' | 'archive' | 'qa'>('greeting');
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchType, setSearchType] = useState('title_content');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [activeTab]);
+
+  const fetchPosts = async (keyword = '') => {
+    setIsLoading(true);
+    try {
+      let query = supabase
+        .from('posts')
+        .select('*', { count: 'exact' })
+        .eq('category', activeTab)
+        .order('created_at', { ascending: false });
+
+      if (keyword) {
+        if (searchType === 'title_content') {
+          query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+        } else if (searchType === 'author') {
+          query = query.ilike('author', `%${keyword}%`);
+        }
+      }
+
+      const { data, count, error } = await query;
+      if (error) throw error;
+
+      setPosts(data || []);
+      setTotalCount(count || 0);
+    } catch (error) {
+      console.error('게시글 로드 실패:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchPosts(searchKeyword);
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen pt-10">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold text-primary mb-4">커뮤니티</h1>
+          <h1 className="text-4xl font-extrabold text-[#0A103D] mb-4">커뮤니티</h1>
           <p className="text-gray-500 text-lg">회원들의 자유로운 소통 공간입니다.</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-200 bg-gray-100/50">
-            <button className="flex-1 py-4 px-6 text-center font-bold text-primary border-b-2 border-primary bg-white">
-              자유게시판
-            </button>
-            <button className="flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-              행정 자료실
-            </button>
-            <button className="flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-              가입/협업 문의
-            </button>
+            {(['greeting', 'free', 'archive', 'qa'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setSearchKeyword('');
+                }}
+                className={`flex-1 py-4 px-6 text-center font-bold transition-all ${
+                  activeTab === tab
+                    ? 'text-[#5486B2] border-b-2 border-[#5486B2] bg-white'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {CATEGORY_MAP[tab]}
+              </button>
+            ))}
           </div>
 
           <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-sm text-gray-500">총 <strong className="text-primary text-base">142</strong>건의 게시물이 있습니다.</span>
-              <div className="flex gap-2">
-                <select className="border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-primary">
-                  <option>제목+내용</option>
-                  <option>작성자</option>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+              <span className="text-sm text-gray-500">
+                총 <strong className="text-[#5486B2] text-base">{totalCount}</strong>건의 게시물이 있습니다.
+              </span>
+              <form onSubmit={handleSearch} className="flex gap-2 w-full md:w-auto">
+                <select 
+                  value={searchType}
+                  onChange={(e) => setSearchType(e.target.value)}
+                  className="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-700 outline-none focus:border-[#5486B2]"
+                >
+                  <option value="title_content">제목+내용</option>
+                  <option value="author">작성자</option>
                 </select>
-                <input type="text" placeholder="검색어 입력" className="border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-primary" />
-                <button className="bg-primary text-white px-4 py-1.5 rounded text-sm hover:bg-primary-light transition-colors">검색</button>
-              </div>
+                <input 
+                  type="text" 
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder="검색어 입력" 
+                  className="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white text-gray-800 outline-none focus:border-[#5486B2] flex-1 md:flex-none" 
+                />
+                <button type="submit" className="bg-[#5486B2] text-white px-4 py-1.5 rounded text-sm hover:bg-[#436f94] transition-colors whitespace-nowrap">검색</button>
+              </form>
             </div>
 
             {/* Table (Mangboard Basic Skin Replacement) */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-t-2 border-primary">
+              <table className="w-full text-left border-t-2 border-[#5486B2]">
                 <thead>
                   <tr className="border-b border-gray-200 text-sm text-gray-600 bg-gray-50">
                     <th className="py-4 px-4 font-semibold text-center w-16">번호</th>
                     <th className="py-4 px-4 font-semibold text-center w-24">분류</th>
                     <th className="py-4 px-4 font-semibold">제목</th>
-                    <th className="py-4 px-4 font-semibold text-center w-24">작성자</th>
-                    <th className="py-4 px-4 font-semibold text-center w-32">작성일</th>
-                    <th className="py-4 px-4 font-semibold text-center w-20">조회</th>
+                    <th className="py-4 px-4 font-semibold text-center w-28">작성자</th>
+                    <th className="py-4 px-4 font-semibold text-center w-36">작성일</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {/* Notice items */}
-                  <tr className="bg-primary/5 hover:bg-primary/10 transition-colors">
-                    <td className="py-4 px-4 text-center"><span className="bg-accent text-primary text-xs font-bold px-2 py-1 rounded">공지</span></td>
-                    <td className="py-4 px-4 text-center text-sm text-gray-500">필독</td>
-                    <td className="py-4 px-4 font-bold text-primary cursor-pointer hover:underline">
-                      사단법인 직장인밴드연합회 커뮤니티 이용 규칙 안내
-                    </td>
-                    <td className="py-4 px-4 text-center text-sm">최고관리자</td>
-                    <td className="py-4 px-4 text-center text-sm text-gray-500">2026.04.01</td>
-                    <td className="py-4 px-4 text-center text-sm text-gray-500">1,240</td>
-                  </tr>
-                  
-                  {/* Normal items */}
-                  {[
-                    { id: 142, category: '합주모집', title: '강남/양재 지역에서 함께할 베이시스트 구합니다 (경력자)', author: 'GrooveMaker', date: '2026.04.18', views: 42 },
-                    { id: 141, category: '자유수다', title: '어제 본 공연 너무 멋있었습니다!', author: '초보마스터', date: '2026.04.17', views: 156 },
-                    { id: 140, category: '악기질문', title: '펜더 스트라토캐스터 픽업 교체 관련해서 조언 부탁드립니다', author: '기타키즈', date: '2026.04.16', views: 89 },
-                    { id: 139, category: '공연홍보', title: '이번 주말 직장인 인디밴드 연합 공연 안내 (홍대)', author: '인디홀릭', date: '2026.04.15', views: 231 },
-                    { id: 138, category: '자유수다', title: '합주실 방음 공사 꿀팁 있으신 분?', author: 'Drumer99', date: '2026.04.15', views: 104 },
-                  ].map((post) => (
-                    <tr key={post.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-4 text-center text-gray-500 text-sm">{post.id}</td>
-                      <td className="py-4 px-4 text-center text-sm text-gray-500">{post.category}</td>
-                      <td className="py-4 px-4 font-medium text-gray-800 cursor-pointer hover:text-primary transition-colors">
-                        {post.title}
-                        {post.id % 2 === 0 && <span className="ml-2 text-xs text-red-500 font-bold">[3]</span>}
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5} className="py-20 text-center text-gray-500">
+                        게시글을 불러오는 중입니다...
                       </td>
-                      <td className="py-4 px-4 text-center text-sm truncate">{post.author}</td>
-                      <td className="py-4 px-4 text-center text-sm text-gray-500">{post.date}</td>
-                      <td className="py-4 px-4 text-center text-sm text-gray-500">{post.views}</td>
                     </tr>
-                  ))}
+                  ) : posts.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-20 text-center text-gray-500">
+                        등록된 게시물이 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    posts.map((post, idx) => (
+                      <tr key={post.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-4 px-4 text-center text-gray-500 text-sm">{posts.length - idx}</td>
+                        <td className="py-4 px-4 text-center text-sm text-gray-500">
+                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded border border-gray-200">
+                            {CATEGORY_MAP[post.category] || post.category}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 font-medium text-gray-800 hover:text-[#5486B2] transition-colors">
+                          <Link href={`/board/${post.id}`} className="block">
+                            {post.title}
+                          </Link>
+                        </td>
+                        <td className="py-4 px-4 text-center text-sm text-gray-700 truncate max-w-[120px]">{post.author}</td>
+                        <td className="py-4 px-4 text-center text-sm text-gray-500">
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {/* Pagination & Write Button */}
-            <div className="mt-8 flex justify-between items-center">
-              <div className="w-24"></div> {/* Spacer to center pagination */}
-              <div className="flex gap-1">
-                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 text-gray-500 rounded bg-white hover:bg-gray-50">&lt;</button>
-                <button className="w-8 h-8 flex items-center justify-center border border-primary text-white bg-primary rounded font-bold">1</button>
-                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 text-gray-700 rounded bg-white hover:bg-gray-50">2</button>
-                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 text-gray-700 rounded bg-white hover:bg-gray-50">3</button>
-                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 text-gray-500 rounded bg-white hover:bg-gray-50">&gt;</button>
-              </div>
-              <Link href="/board" className="bg-primary text-white px-5 py-2 rounded font-bold shadow hover:bg-primary-light transition-colors text-sm">
+            {/* Write Button & Footer */}
+            <div className="mt-8 flex justify-end items-center">
+              <Link 
+                href={`/board/write?category=${activeTab}`} 
+                className="bg-[#5486B2] text-white px-6 py-2.5 rounded font-bold shadow hover:bg-[#436f94] transition-colors text-sm"
+              >
                 글쓰기
               </Link>
             </div>
