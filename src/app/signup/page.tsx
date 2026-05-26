@@ -168,7 +168,7 @@ export default function SignupPage() {
                 축하합니다! <span className="text-accent font-black text-lg">{formData.name}</span> 님의 가입 신청이 성공적으로 접수되었습니다.
               </p>
               <p className="text-sm text-gray-400 border-t border-white/10 pt-4 font-medium">
-                현재 계정은 <span className="text-white font-black text-sm bg-gray-700 px-2 py-0.5 rounded">준회원 (가입 대기)</span> 상태입니다. 최고관리자(<span className="text-accent font-black">도욱상 님</span>)의 가입 승인 처리 후 정회원으로 모든 서비스를 정상적으로 이용하실 수 있습니다.
+                현재 계정은 <span className="text-white font-black text-sm bg-gray-700 px-2 py-0.5 rounded">준회원 (가입 대기)</span> 상태입니다. 관리자의 가입 승인 처리 후 정회원으로 모든 서비스를 정상적으로 이용하실 수 있습니다.
               </p>
             </div>
 

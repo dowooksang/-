@@ -46,3 +46,5 @@ export interface Branch {
 }
 
 // Note: In‑memory DB functions have been removed. Use Supabase client instead.
+export const db = {}; // dummy export to satisfy imports
+
