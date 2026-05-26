@@ -1,3 +1,4 @@
+// 로그인 API – Supabase users 테이블 기반 구현
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabaseClient';
@@ -6,10 +7,10 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    // Supabase에서 사용자 조회
+    // users 테이블에서 사용자 조회
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, email, password, level, status, nickname, name')
+      .select('id, email, password, nickname, name, level, status')
       .eq('email', email)
       .single();
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 비밀번호 검증
+    // 비밀번호 검증 (bcrypt)
     const isMatch = await bcrypt.compare(password, user.password ?? '');
     if (!isMatch) {
       return NextResponse.json(
@@ -29,17 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Supabase Auth 세션 생성 (자동 쿠키 발행)
-    const { error: signInErr } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInErr) {
-      return NextResponse.json({ error: signInErr.message }, { status: 401 });
-    }
-
-    // 응답에 쿠키와 사용자 정보 포함
+    // 성공 응답 + 쿠키 설정 (email)
     const response = NextResponse.json(
       {
         id: user.id,
@@ -61,3 +52,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
   }
 }
+
