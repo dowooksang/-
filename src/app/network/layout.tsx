@@ -16,14 +16,14 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
       if (!user) {
         alert('로그인이 필요합니다.');
         router.push('/login');
-      } else if (user.level < UserLevel.MASTER) {
+      } else if (user.level < UserLevel.LV4_MANAGER) {
         alert('지부장급 이상의 관리자만 접근할 수 있는 메뉴입니다.');
         router.push('/');
       }
     }
   }, [isLoaded, user, router]);
 
-  if (!isLoaded || !user || user.level < UserLevel.MASTER) {
+  if (!isLoaded || !user || user.level < UserLevel.LV4_MANAGER) {
     return <div className="min-h-screen bg-primary flex items-center justify-center text-white">권한 확인 중...</div>;
   }
 
