@@ -1,33 +1,52 @@
+// 회원가입 API – Supabase 기반 구현
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/store';
+import bcrypt from 'bcryptjs';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password, nickname, name, phone, bandName, position, address } = body;
+    const {
+      email,
+      password,
+      nickname,
+      name,
+      phone,
+      bandName,
+      position,
+      address,
+    } = await request.json();
 
+    // 필수 항목 검증
     if (!email || !password || !name || !phone || !position || !address) {
       return NextResponse.json({ error: '필수 항목을 모두 입력해주세요.' }, { status: 400 });
     }
 
-    try {
-      const newUser = db.addUser({
-        email,
-        password,
-        nickname: nickname || name, // 닉네임이 없으면 본명으로
-        name,
-        phone,
-        bandName: bandName || '소속 없음', // 밴드명 입력 없으면 기본값
-        position,
-        address
-      });
-      // 성공적으로 가입 (비밀번호는 제외하고 반환)
-      const { password: _, ...userWithoutPassword } = newUser;
-      return NextResponse.json(userWithoutPassword, { status: 201 });
-    } catch (e: any) {
-      return NextResponse.json({ error: e.message }, { status: 409 });
+    // 비밀번호 해시
+    const hashedPwd = await bcrypt.hash(password, 10);
+
+    // Supabase에 사용자 삽입
+    const { data, error } = await supabase.from('users').insert({
+      email,
+      password: hashedPwd,
+      nickname: nickname || name,
+      name,
+      phone,
+      band_name: bandName || '소속 없음',
+      position,
+      address,
+      status: 'pending',
+      level: 1, // LV1_GUEST
+    }).single();
+
+    if (error) {
+      // 예: 중복 이메일
+      return NextResponse.json({ error: error.message }, { status: 409 });
     }
-  } catch (error) {
+
+    // 비밀번호 제거하고 응답
+    const { password: _, ...userWithoutPassword } = data as any;
+    return NextResponse.json(userWithoutPassword, { status: 201 });
+  } catch (e) {
     return NextResponse.json({ error: '잘못된 요청입니다.' }, { status: 500 });
   }
 }
