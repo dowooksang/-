@@ -1,50 +1,90 @@
-// 회원 등급 (6단계) 정의
-export enum UserLevel {
-  LV1_GUEST = 1,     // 준회원 (회원가입 직후)
-  LV2_MEMBER = 2,    // 정회원 (지부 인증 완료)
-  LV3_EXCELLENT = 3, // 우수회원 (활동 우수, 공동 행사 참여)
-  LV4_MANAGER = 4,   // 지부장급 (네트워크, 소속 회원 승인 권한)
-  LV5_ADMIN = 5,     // 관리자 (연합회 총괄 본부 스태프)
-  LV6_CEO = 6        // 대표이사 (최고 권한, 최종 의사결정)
-}
+import { supabase } from '@/lib/supabaseClient';
 
-export interface User {
-  id: string;
-  email: string;
-  password?: string; // bcrypt 해시 (Supabase Auth 사용 시 null 가능)
-  nickname: string;
-  name: string; // 이름
-  phone: string; // 연락처
-  bandName: string; // 소속 동호회(클럽)명
-  position: string; // 악기 파트
-  address: string; // 주소
-  status: 'pending' | 'active'; // 승인 상태
-  level: UserLevel;
-  createdAt: string;
-}
+// Re‑export UserLevel enum for existing imports
+export { UserLevel } from '@/lib/userLevel';
 
-export interface Post {
-  id: string;
-  title: string;
-  content: string;
-  author: string;
-  authorId?: string; // 작성자 고유 ID
-  createdAt: string;
-}
+/**
+ * Supabase‑backed data access wrapper replacing the previous in‑memory DB.
+ * Only the methods used throughout the project are implemented.
+ */
+export const db = {
+  // ---------- Users ----------
+  async getUser(email: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    if (error) throw error;
+    return data;
+  },
 
-export interface Branch {
-  id: string;
-  name: string; // 지부 명칭
-  managerName: string; // 지부장 성함
-  managerPhone: string; // 지부장 연락처
-  region: string; // 활동 지역
-  hasPracticeRoom: boolean; // 연습실 유무
-  bandCount: number; // 소속 밴드 수
-  status: 'pending' | 'approved';
-  userId: string; // 신청자 고유 ID
-  createdAt: string;
-}
+  async getUsers() {
+    const { data, error } = await supabase.from('users').select('*');
+    if (error) throw error;
+    return data;
+  },
 
-// Note: In‑memory DB functions have been removed. Use Supabase client instead.
-export const db = {}; // dummy export to satisfy imports
+  // ---------- Posts ----------
+  async getPosts() {
+    const { data, error } = await supabase.from('posts').select('*');
+    if (error) throw error;
+    return data;
+  },
+
+  async addPost(post: { title: string; content: string; author: string }) {
+    const { data, error } = await supabase.from('posts').insert(post).single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getPost(id: string) {
+    const { data, error } = await supabase.from('posts').select('*').eq('id', id).single();
+    if (error) return null; // not found
+    return data;
+  },
+
+  async updatePost(id: string, updates: Partial<{ title: string; content: string; author: string }>) {
+    const { data, error } = await supabase.from('posts').update(updates).eq('id', id).single();
+    if (error) return null;
+    return data;
+  },
+
+  async deletePost(id: string) {
+    const { error } = await supabase.from('posts').delete().eq('id', id);
+    return !error;
+  },
+
+  // ---------- Branches ----------
+  async addBranch(branch: {
+    name: string;
+    managerName: string;
+    managerPhone: string;
+    region: string;
+    hasPracticeRoom: boolean;
+    bandCount: number;
+    userId: string;
+  }) {
+    const { data, error } = await supabase.from('branches').insert(branch).single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getBranches() {
+    const { data, error } = await supabase.from('branches').select('*');
+    if (error) throw error;
+    return data;
+  },
+
+  // ---------- Admin utilities (generic) ----------
+  async getUsersSafe() {
+    const users = await this.getUsers();
+    // remove password field
+    return users.map((u: any) => {
+      const { password, ...rest } = u;
+      return rest;
+    });
+  },
+};
+
 
