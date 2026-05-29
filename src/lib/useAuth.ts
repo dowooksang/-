@@ -10,7 +10,7 @@ export const getLevelName = (level: UserLevel) => {
     case UserLevel.LV3_EXCELLENT: return '우수회원';
     case UserLevel.LV4_MANAGER: return '지부장급';
     case UserLevel.LV5_ADMIN: return '관리자';
-    case UserLevel.LV6_CEO: return '대표이사';
+    case UserLevel.LV6_CEO: return '관리자';
     default: return '알려지지 않음';
   }
 };
