@@ -12,8 +12,9 @@ export async function POST(request: Request) {
     });
 
     if (error || !data?.user) {
+      console.error('Supabase 로그인 에러:', error?.message, error);
       return NextResponse.json(
-        { error: '이메일 또는 비밀번호가 일치하지 않습니다.' },
+        { error: error?.message || '이메일 또는 비밀번호가 일치하지 않습니다.' },
         { status: 401 }
       );
     }
@@ -30,6 +31,23 @@ export async function POST(request: Request) {
       { status: 200 }
     );
 
+    // Set session cookies for Supabase client
+    if (data.session) {
+      response.cookies.set('sb-access-token', data.session.access_token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      });
+      response.cookies.set('sb-refresh-token', data.session.refresh_token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
+
+    // optional email cookie for UI convenience
     response.cookies.set('email', user.email, {
       httpOnly: true,
       sameSite: 'lax',
@@ -40,5 +58,4 @@ export async function POST(request: Request) {
   } catch (e) {
     return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
   }
-}
 
