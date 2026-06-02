@@ -28,9 +28,9 @@ export default function AdminLoginPage() {
       });
       if (authError) throw authError;
 
-      // 관리자 테이블에서 레벨 확인
+      // 관리자인지 레벨 6 확인
       const { data, error: dbError } = await supabase
-        .from('admins')
+        .from('admin_users')
         .select('level')
         .eq('email', form.email)
         .single();
@@ -39,10 +39,12 @@ export default function AdminLoginPage() {
         throw new Error('관리자 권한이 없습니다.');
       }
 
-      // 성공 시 대시보드로 이동
-      router.push('/admin/dashboard');
+      // 성공 시 대시보드로 강제 이동
+      router.replace('/admin/dashboard');
     } catch (err: any) {
-      setError(err.message || '로그인 중 오류가 발생했습니다.');
+      const msg = err.message || '로그인 중 오류가 발생했습니다.';
+      setError(msg);
+      alert(msg);
     } finally {
       setLoading(false);
     }

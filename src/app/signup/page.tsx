@@ -14,7 +14,6 @@ export default function SignupPage() {
     email: '',
     password: '',
     phone: '',
-    branch: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,7 +41,6 @@ export default function SignupPage() {
         name: form.name,
         email: form.email,
         phone: form.phone,
-        branch: form.branch,
         created_at: new Date().toISOString(),
       });
       if (dbError) throw dbError;
@@ -98,14 +96,7 @@ export default function SignupPage() {
           onChange={handleChange}
           className="w-full p-2 rounded bg-gray=700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <input
-          type="text"
-          name="branch"
-          placeholder="소속 지부"
-          value={form.branch}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+        // 소속 지부 입력 필드 제거됨
         <button
           type="submit"
           className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 rounded transition-colors"
