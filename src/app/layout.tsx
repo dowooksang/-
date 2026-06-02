@@ -81,10 +81,7 @@ export default function RootLayout({
           </div>
         </footer>
         {/* Floating Quick Action */}
-        <Link href="/branch/recruitment" className="fixed bottom-10 right-10 bg-accent text-[#0A103D] hover:bg-[#82C8FF] shadow-[0_10px_30px_rgba(130,200,255,0.4)] rounded-full px-6 py-4 font-bold text-lg flex items-center gap-3 transition-all hover:scale-105 z-50 animate-bounce group">
-          <span className="text-2xl">🤝</span>
-          <span className="group-hover:mr-1 transition-all">지부 가입 상담하기</span>
-        </Link>
+        
       </body>
     </html>
   );

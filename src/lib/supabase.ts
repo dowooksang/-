@@ -9,3 +9,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Supabase 클라이언트 생성
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+/**
+ * admins 테이블에서 이메일로 관리자 레코드 조회
+ */
+export const getAdminByEmail = async (email: string) => {
+  const { data, error } = await supabase
+    .from('admins')
+    .select('id, email, level')
+    .eq('email', email)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * 현재 사용자 객체에 level 필드가 있으면 최고관리자(레벨 6)인지 판단
+ */
+export const isAdmin = (user: any) => {
+  return user?.level && Number(user.level) === 6;
+};
