@@ -1,18 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/useAuth';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { login } = useAuth();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const { login, logout } = useAuth();
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,68 +16,70 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
+    // 이전 세션이 남아 있을 경우 정리
+    try {
+      await logout();
+    } catch (_) {}
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+        credentials: 'include', // 쿠키 포함
+        body: JSON.stringify({ email: formData.email, password: formData.password }),
       });
 
-      const data = await res.json();
+      console.log('Login response status:', res.status);
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('서버 응답 형식이 올바르지 않습니다.');
+      }
+
+      console.log('Login response data:', data);
 
       if (!res.ok) {
+        // 로그인 실패 → 기존 쿠키/세션 모두 삭제하고 에러 표시
+        await logout();
         throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
       }
 
-      // 로그인 성공 시 로컬 세션 주입
+      // 로그인 성공 → 상태 주입 후 관리자 대시보드 강제 이동
       login(data);
-
-      // 메인 페이지로 이동
-      router.push('/');
-      router.refresh();
-      
+      window.location.href = '/admin/dashboard';
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
     <div className="bg-[#0A103D] min-h-screen text-white flex items-center justify-center py-12 px-6">
       <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-2xl animate-fade-in-up">
         <div className="text-center mb-8">
           <div className="w-48 h-48 mx-auto flex items-center justify-center shadow-xl mb-8 rounded-full bg-white overflow-hidden relative border-4 border-white/20">
-            <Image 
-              src="/logo.png" 
-              alt="로고" 
-              fill
-              className="object-contain p-3"
-            />
+            <Image src="/logo.png" alt="로고" fill className="object-contain p-3" />
           </div>
           <h1 className="text-3xl font-bold mb-2">로그인</h1>
           <p className="text-gray-400 text-sm">연합회 커뮤니티에 오신 것을 환영합니다</p>
         </div>
 
         {error && (
-          <div className="bg-red-500/20 text-red-300 border border-red-500/30 p-4 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
+          <div className="bg-red-500/20 text-red-300 border border-red-500/30 p-4 rounded-lg mb-6 text-sm">{error}</div>
         )}
-
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">이메일</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
               placeholder="example@jb-band.org"
             />
@@ -90,18 +87,18 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">비밀번호</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               required
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
               placeholder="••••••••"
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading}
             className="w-full bg-accent text-[#0A103D] font-bold py-3.5 rounded-lg mt-6 shadow-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
           >

@@ -1,7 +1,9 @@
-'use client';
+
+}'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/lib/useAuth';
 
 /**
  * 관리자 로그인 페이지 – Next.js App Router (src/app/admin/login/page.tsx)
@@ -9,6 +11,7 @@ import { supabase } from '@/lib/supabaseClient';
  */
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,25 +25,29 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password,
+      // API 로 로그인 요청
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: form.email, password: form.password }),
       });
-      if (authError) throw authError;
 
-      // 관리자인지 레벨 6 확인
-      const { data, error: dbError } = await supabase
-        .from('admin_users')
-        .select('level')
-        .eq('email', form.email)
-        .single();
-      if (dbError) throw dbError;
-      if (data?.level !== 6) {
-        throw new Error('관리자 권한이 없습니다.');
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('서버 응답이 올바르지 않습니다.');
       }
 
-      // 성공 시 대시보드로 강제 이동
-      router.replace('/admin/dashboard');
+      if (!res.ok) {
+        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
+      }
+
+      // 로그인 성공 → 상태 주입 후 대시보드 이동
+      login(data);
+      window.location.href = '/admin/dashboard';
     } catch (err: any) {
       const msg = err.message || '로그인 중 오류가 발생했습니다.';
       setError(msg);

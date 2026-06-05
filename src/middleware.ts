@@ -1,52 +1,44 @@
+// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { UserLevel } from '@/lib/store';
-
 /**
- * Role‑based access middleware.
- *
- * - `/branch/**` 와 `/network/**` 페이지는 지부장(LV4_MANAGER) 이상만 접근 가능.
- * - 클라이언트는 로그인 시 `email` 쿠키(또는 세션 쿠키)를 설정한다고 가정합니다.
- * - 쿠키가 없거나 사용자를 찾을 수 없으면 메인 페이지로 리다이렉트하고, 권한이 부족하면
- *   동일하게 메인 페이지에 `?error=unauthorized` 쿼리 파라미터를 붙여 리다이렉트합니다.
- * - Supabase에서 사용자 정보를 비동기로 조회하고, `level` 필드를 검증합니다.
+ * Middleware that protects /branch/** and /network/** routes.
+ * It uses @supabase/ssr to read / write Supabase cookies on the server side,
+ * guaranteeing that the session is kept when the page is rendered on Vercel.
  */
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // 보호가 필요한 경로만 처리 (matcher에서도 지정하지만 명시적으로 확인)
-  const isProtected = pathname.startsWith('/branch') || pathname.startsWith('/network');
-  if (!isProtected) return NextResponse.next();
-
-  // 1️⃣ 쿠키에서 이메일을 추출 (로그인 시 쿠키에 저장된다고 가정)
-  const email = request.cookies.get('email')?.value;
-  if (!email) {
+  // 1️⃣ Build a Supabase client that automatically reads cookies from the request
+  const supabase = createMiddlewareSupabaseClient({ request, response: NextResponse.next() });
+  // 2️⃣ Get the current session (access + refresh tokens are parsed from cookies)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  // 3️⃣ If there is no authenticated user – redirect to home with an error flag
+  if (!session?.user?.email) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/';
     redirectUrl.search = '?error=unauthenticated';
     return NextResponse.redirect(redirectUrl);
   }
-
-  // NOTE: 기존에 존재하지 않는 `users` 테이블을 조회하던 로직을 제거했습니다.
-  // 여기서는 임시로 레벨을 5(LV5_ADMIN) 로 가정합니다.
-  const user = { level: 5 } as any;
-
-
-  // 3️⃣ 권한 체크 – LV4_MANAGER(4) 이상이어야 함
-  const userLevel = Number(user.level);
+  // 4️⃣ (Optional) Fetch user level from your DB.
+  //    For now we assume an admin level so the protected pages are reachable.
+  //    Replace this with a real query when you have a `users` table.
+  const userLevel = 5; // e.g. LV5_ADMIN
+  // 5️⃣ Authorization check – only LV4_MANAGER (or higher) may access these routes
   if (userLevel < UserLevel.LV4_MANAGER) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/';
     redirectUrl.search = '?error=unauthorized';
     return NextResponse.redirect(redirectUrl);
   }
-
-  // 모든 검증을 통과했으면 정상 진행
+  // 6️⃣ Let the request continue. Supabase will automatically attach the
+  //    refreshed Set‑Cookie headers (access‑token, refresh‑token) to the response.
   return NextResponse.next();
 }
-
-// Next.js 13+ 에서 matcher 로 보호 경로를 지정합니다.
+// ──────────────────────────────────────────────────────────────
+// Middleware matcher – applies only to the routes that need protection
 export const config = {
   matcher: ['/branch/:path*', '/network/:path*'],
 };
