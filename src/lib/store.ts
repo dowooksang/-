@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import { UserLevel } from '@/lib/userLevel';
 
 // Re‑export UserLevel enum for existing imports
 export { UserLevel } from '@/lib/userLevel';
@@ -84,6 +85,61 @@ export const db = {
       const { password, ...rest } = u;
       return rest;
     });
+  },
+
+  // ---------- Admin management functions ----------
+  async approveBranch(branchId: string): Promise<boolean> {
+    const { data: branch, error: getErr } = await supabase
+      .from('branches')
+      .select('userId')
+      .eq('id', branchId)
+      .single();
+    if (getErr || !branch) return false;
+
+    const { error: updateBranchErr } = await supabase
+      .from('branches')
+      .update({ status: 'approved' })
+      .eq('id', branchId);
+    if (updateBranchErr) return false;
+
+    const { error: updateUserErr } = await supabase
+      .from('users')
+      .update({ level: UserLevel.LV4_MANAGER })
+      .eq('id', branch.userId);
+    
+    return !updateUserErr;
+  },
+
+  async appointAdmin(userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('users')
+      .update({ level: UserLevel.LV5_ADMIN })
+      .eq('id', userId);
+    return !error;
+  },
+
+  async approveUser(userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('users')
+      .update({ status: 'active', level: UserLevel.LV2_MEMBER })
+      .eq('id', userId);
+    return !error;
+  },
+
+  async dismissAdmin(userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('users')
+      .update({ level: UserLevel.LV2_MEMBER })
+      .eq('id', userId);
+    return !error;
+  },
+
+  async changeUserLevel(userId: string, level: number): Promise<boolean> {
+    const { error } = await supabase
+      .from('users')
+      .update({ level })
+      .eq('id', userId);
+    return !error;
   },
 };
 

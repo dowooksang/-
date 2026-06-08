@@ -13,7 +13,7 @@ export default function AdminBranchesPage() {
 
   useEffect(() => {
     if (isLoaded) {
-      if (!user || user.level < UserLevel.LV5_ADMIN) {
+      if (!user || user.level === undefined || user.level < UserLevel.LV5_ADMIN) {
         alert('관리자만 접근할 수 있습니다.');
         router.push('/');
         return;

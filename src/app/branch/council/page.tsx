@@ -11,7 +11,7 @@ export default function BranchCouncilPage() {
   if (!isLoaded) return <div className="min-h-screen bg-[#0A103D] text-white flex items-center justify-center">로딩 중...</div>;
 
   // 권한 체크: 지부장급(LV4_MANAGER) 이상만 접근 가능
-  if (!user || user.level < UserLevel.LV4_MANAGER) {
+  if (!user || user.level === undefined || user.level < UserLevel.LV4_MANAGER) {
     return (
       <div className="min-h-screen bg-[#0A103D] flex items-center justify-center p-6 text-center">
         <div className="bg-white/5 p-12 rounded-2xl border border-white/10 max-w-lg w-full backdrop-blur-md">

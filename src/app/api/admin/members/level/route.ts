@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '회원 ID와 변경할 등급이 필요합니다.' }, { status: 400 });
     }
 
-    const success = db.changeUserLevel(userId, level);
+    const success = await db.changeUserLevel(userId, level);
     
     if (success) {
       return NextResponse.json({ message: '등급이 변경되었습니다.' }, { status: 200 });

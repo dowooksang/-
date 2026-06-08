@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '지부 ID가 필요합니다.' }, { status: 400 });
     }
 
-    const success = db.approveBranch(branchId);
+    const success = await db.approveBranch(branchId);
     
     if (success) {
       return NextResponse.json({ message: '승인되었습니다.' }, { status: 200 });

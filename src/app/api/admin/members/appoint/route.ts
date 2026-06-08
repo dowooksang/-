@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '회원 ID가 필요합니다.' }, { status: 400 });
     }
 
-    const success = db.appointAdmin(userId);
+    const success = await db.appointAdmin(userId);
     
     if (success) {
       return NextResponse.json({ message: '관리자로 임명되었습니다.' }, { status: 200 });

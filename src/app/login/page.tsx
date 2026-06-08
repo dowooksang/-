@@ -16,42 +16,17 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
-    // 이전 세션이 남아 있을 경우 정리
     try {
-      await logout();
-    } catch (_) {}
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // 쿠키 포함
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
-      });
-
-      console.log('Login response status:', res.status);
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        throw new Error('서버 응답 형식이 올바르지 않습니다.');
-      }
-
-      console.log('Login response data:', data);
-
-      if (!res.ok) {
-        // 로그인 실패 → 기존 쿠키/세션 모두 삭제하고 에러 표시
-        await logout();
-        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
-      }
-
-      // 로그인 성공 → 상태 주입 후 관리자 대시보드 강제 이동
-      login(data);
+      // useAuth의 login 함수가 내부적으로 supabase.auth.signInWithPassword를 호출합니다.
+      await login(formData.email, formData.password);
+      
+      // 로그인 성공 → 관리자 대시보드 강제 이동
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message);
+      // 로그인 실패 시 세션 완전 파괴
+      await logout();
+      setError(err.message || '이메일이나 비밀번호가 일치하지 않습니다.');
     } finally {
       setIsLoading(false);
     }

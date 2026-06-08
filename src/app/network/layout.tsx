@@ -16,14 +16,14 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
       if (!user) {
         alert('로그인이 필요합니다.');
         router.push('/login');
-      } else if (user.level < UserLevel.LV4_MANAGER) {
+      } else if (user.level === undefined || user.level < UserLevel.LV4_MANAGER) {
         alert('지부장급 이상의 관리자만 접근할 수 있는 메뉴입니다.');
         router.push('/');
       }
     }
   }, [isLoaded, user, router]);
 
-  if (!isLoaded || !user || user.level < UserLevel.LV4_MANAGER) {
+  if (!isLoaded || !user || user.level === undefined || user.level < UserLevel.LV4_MANAGER) {
     return <div className="min-h-screen bg-primary flex items-center justify-center text-white">권한 확인 중...</div>;
   }
 
@@ -90,7 +90,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
               <div className="text-sm text-gray-400 mb-2">현재 접속자</div>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold border border-accent/30">
-                  {user.nickname.charAt(0)}
+                  {(user.nickname || '').charAt(0)}
                 </div>
                 <div>
                   <div className="font-bold text-white">{user.nickname}</div>

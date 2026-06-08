@@ -44,7 +44,7 @@ export default function VideoPage() {
           <h2 className="text-2xl font-bold text-white">최신 영상</h2>
           
           {/* 정회원 이상만 글쓰기 버튼 표시 */}
-          {user && user.level >= UserLevel.MEMBER ? (
+          {user && user.level !== undefined && user.level >= UserLevel.LV2_MEMBER ? (
             <button className="bg-accent text-[#0A103D] font-bold px-6 py-2.5 rounded-lg hover:bg-[#82C8FF] transition-all shadow-md flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

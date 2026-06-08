@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     );
 
     // optional: 쿠키에 email 저장 (로그인 후 자동 로그인은 별도 구현 필요)
-    response.cookies.set('email', userEmail, {
+    response.cookies.set('email', userEmail || '', {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',

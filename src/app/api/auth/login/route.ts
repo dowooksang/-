@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     }
     // 클라이언트 사이드 UI(예: 헤더, 대시보드)에서 사용자의 로그인 이메일을 JS 스크립트로 접근하여
     // 화면에 보여줄 수 있도록, 이 쿠키에 한해서만 httpOnly 설정을 false로 지정하여 내보냅니다.
-    response.cookies.set('email', user.email, {
+    response.cookies.set('email', user.email || '', {
       httpOnly: false,
       sameSite: 'lax',
       path: '/',

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const post = db.getPost(id);
+  const post = await db.getPost(id);
 
   if (!post) {
     notFound();

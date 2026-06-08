@@ -16,7 +16,7 @@ export default function AdminMembersPage() {
   // 접근 제어 및 데이터 로드
   useEffect(() => {
     if (isLoaded) {
-      if (!user || user.level < UserLevel.LV5_ADMIN) {
+      if (!user || user.level === undefined || user.level < UserLevel.LV5_ADMIN) {
         alert('관리자만 접근할 수 있습니다.');
         router.push('/');
         return;
@@ -27,7 +27,7 @@ export default function AdminMembersPage() {
 
   // 5초 간격 실시간 자동 리프레시 (회원가입 즉시 반영 실현)
   useEffect(() => {
-    if (isLoaded && user && user.level >= UserLevel.LV5_ADMIN) {
+    if (isLoaded && user && user.level !== undefined && user.level >= UserLevel.LV5_ADMIN) {
       const interval = setInterval(() => {
         fetchMembers();
       }, 5000);

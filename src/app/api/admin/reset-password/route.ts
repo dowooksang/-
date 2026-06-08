@@ -3,11 +3,14 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Service role key must be defined in .env.local as SUPABASE_SERVICE_ROLE_KEY
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, serviceKey);
+const getAdminSupabase = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  return createClient(supabaseUrl, serviceKey);
+};
 
 export async function POST(request: Request) {
+  const supabase = getAdminSupabase();
   try {
     const { email, newPassword } = await request.json();
     if (!email || !newPassword) {
@@ -15,9 +18,13 @@ export async function POST(request: Request) {
     }
 
     // Find user by email
-    const { data: user, error: findErr } = await supabase.auth.admin.getUserByEmail(email);
-    if (findErr) {
-      return NextResponse.json({ error: findErr.message }, { status: 404 });
+    const { data: user, error: findErr } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+    if (findErr || !user) {
+      return NextResponse.json({ error: findErr?.message || '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
     // Update password

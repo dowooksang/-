@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
 import { UserLevel } from '@/lib/store';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseClient';
 import Editor from '@/components/Editor';
 
 interface BoardFormProps {
@@ -33,16 +33,26 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
     
     if (!isLoaded) return;
     
-    if (!user) {
-      alert('로그인이 필요한 서비스입니다.');
-      router.push('/login');
-      return;
-    }
-
-
     setIsLoading(true);
 
     try {
+      // 폼 제출 직전, 실제 Supabase 세션이 여전히 유효한지 비동기로 최종 검증합니다.
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        alert('로그인 세션이 만료되었거나 올바르지 않습니다. 다시 로그인해 주세요.');
+        router.push('/login');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!user) {
+        alert('로그인이 필요한 서비스입니다.');
+        router.push('/login');
+        setIsLoading(false);
+        return;
+      }
+
       if (isEdit) {
         const { error } = await supabase
           .from('posts')
@@ -60,7 +70,7 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
           .insert([{
             title: formData.title,
             content: formData.content,
-            author: user.nickname,
+            author: user.nickname || '익명',
             category: category
           }])
           .select()
@@ -71,6 +81,7 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
       }
       router.refresh();
     } catch (error) {
+      console.error('Submit post error:', error);
       alert('게시글 저장 중 오류가 발생했습니다.');
       setIsLoading(false);
     }

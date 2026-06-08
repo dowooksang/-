@@ -1,17 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import BoardForm from '@/components/BoardForm';
 import { useAuth } from '@/lib/useAuth';
 import { UserLevel } from '@/lib/store';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function WritePage() {
   const { user, isLoaded } = useAuth();
+  const [isValidSession, setIsValidSession] = useState<boolean | null>(null);
 
-  if (!isLoaded) return <div className="py-20 text-center">로딩 중...</div>;
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsValidSession(!!session);
+      } catch (err) {
+        console.error('Session validation error:', err);
+        setIsValidSession(false);
+      }
+    };
+    if (isLoaded) {
+      verifySession();
+    }
+  }, [isLoaded]);
 
-  if (!user) {
+  if (!isLoaded || isValidSession === null) return <div className="py-20 text-center">로딩 중...</div>;
+
+  if (!user || !isValidSession) {
     return (
       <div className="bg-white flex-1 w-full flex items-center justify-center py-32">
         <div className="text-center">

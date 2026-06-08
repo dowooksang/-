@@ -1,19 +1,29 @@
 import React from 'react';
 
-export default function Page() {
+/**
+ * 최고관리자 전용 대시보드 – Tailwind CSS 기반 디자인
+ * 화면 중앙에 환영 인사와 왼쪽에 가짜 사이드바 메뉴를 배치합니다.
+ */
+export default function AdminDashboard() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white p-12 rounded-2xl shadow-sm border border-gray-100 max-w-lg w-full">
-        <div className="text-6xl mb-6">🚧</div>
-        <h1 className="text-2xl font-bold text-[#0A103D] mb-4">워드프레스 대시보드</h1>
-        <p className="text-gray-500 mb-8">
-          해당 페이지는 현재 <b>준비 중(개발 중)</b>입니다.<br/>
-          조금만 기다려 주시면 멋진 모습으로 찾아뵙겠습니다!
-        </p>
-        <a href="/admin" className="inline-block px-6 py-3 bg-accent text-[#0A103D] font-bold rounded-lg shadow-sm hover:bg-[#82C8FF] transition-colors">
-          관리자 홈으로 돌아가기
-        </a>
-      </div>
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar (가짜 메뉴) */}
+      <aside className="w-64 bg-white shadow-md p-6 flex flex-col space-y-4">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">관리자 메뉴</h2>
+        <ul className="space-y-2">
+          <li className="text-gray-600 hover:text-gray-900 cursor-pointer">회원 관리</li>
+          <li className="text-gray-600 hover:text-gray-900 cursor-pointer">게시판 관리</li>
+          <li className="text-gray-600 hover:text-gray-900 cursor-pointer">유통/재고 현황</li>
+        </ul>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center p-8">
+        <h1 className="text-3xl font-bold text-gray-800 text-center">
+          Culture Club 24 최고관리자님, 환영합니다! 오늘 하루도 화이팅입니다!
+        </h1>
+      </main>
     </div>
   );
 }
+

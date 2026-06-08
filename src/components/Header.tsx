@@ -86,7 +86,7 @@ export default function Header() {
 
   const navLinks = [
     ...baseNavLinks,
-    ...(user && user.level >= UserLevel.LV4_MANAGER ? [{
+    ...(user && user.level !== undefined && user.level >= UserLevel.LV4_MANAGER ? [{
       href: '/network',
       label: '[네트워크 협력·축제 보드]',
       subItems: [
@@ -95,7 +95,7 @@ export default function Header() {
         { href: '/network/sponsorship', label: '기업 후원 매칭 현황', icon: '🤝' }
       ]
     }] : []),
-    ...(user && user.level >= UserLevel.LV5_ADMIN ? [{
+    ...(user && user.level !== undefined && user.level >= UserLevel.LV5_ADMIN ? [{
       href: '/admin',
       label: '[시스템 관리자 전용]',
       subItems: [

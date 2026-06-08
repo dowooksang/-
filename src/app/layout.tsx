@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import Header from "@/components/Header";
+import { AuthProvider } from "@/lib/useAuth";
 
 export const metadata: Metadata = {
   title: "사단법인 직장인밴드연합회 - SoundBridge",
@@ -23,11 +24,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`bg-gray-50 text-gray-900 min-h-screen flex flex-col font-sans`}>
-        {/* Navigation Bar Header Client Component */}
-        <Header />
+        <AuthProvider>
+          {/* Navigation Bar Header Client Component */}
+          <Header />
 
-        <main className="flex-1 w-full flex flex-col">
-          {children}
+          <main className="flex-1 w-full flex flex-col">
+            {children}
         </main>
 
         <footer className="bg-[#111827] text-gray-400 py-12 mt-auto border-t border-gray-800">
@@ -81,7 +83,7 @@ export default function RootLayout({
           </div>
         </footer>
         {/* Floating Quick Action */}
-        
+        </AuthProvider>
       </body>
     </html>
   );

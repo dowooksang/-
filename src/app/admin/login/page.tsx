@@ -1,8 +1,6 @@
-
-}'use client';
+'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/useAuth';
 
 /**
@@ -11,7 +9,7 @@ import { useAuth } from '@/lib/useAuth';
  */
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,30 +23,14 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
     try {
-      // API 로 로그인 요청
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email: form.email, password: form.password }),
-      });
+      // useAuth의 login 함수가 내부적으로 supabase.auth.signInWithPassword를 호출합니다.
+      await login(form.email, form.password);
 
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        throw new Error('서버 응답이 올바르지 않습니다.');
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || '이메일이나 비밀번호가 일치하지 않습니다.');
-      }
-
-      // 로그인 성공 → 상태 주입 후 대시보드 이동
-      login(data);
+      // 강제 이동 (router.replace + window.location.href)
+      router.replace('/admin/dashboard');
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
+      await logout();
       const msg = err.message || '로그인 중 오류가 발생했습니다.';
       setError(msg);
       alert(msg);

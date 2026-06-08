@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '회원 ID가 필요합니다.' }, { status: 400 });
     }
 
-    const success = db.dismissAdmin(userId);
+    const success = await db.dismissAdmin(userId);
     
     if (success) {
       return NextResponse.json({ message: '관리자에서 해임되었습니다.' }, { status: 200 });
