@@ -57,7 +57,7 @@ export default function Header() {
       label: '커뮤니티',
       subItems: [
         { href: '/board?category=greeting', label: '가입인사', icon: '👋' },
-        { href: '/board', label: '자유게시판 (통합)', icon: '💬' },
+        { href: '/board?category=free', label: '소통 (자유게시판)', icon: '💬' },
         { href: '/board?category=promotion', label: '소속 동호회(클럽) 홍보', icon: '🎸' },
         { href: '/board?category=market', label: '악기/장비 장터', icon: '🛒' },
         { href: '/board?category=archive', label: '활동 자료실', icon: '📁' },
@@ -68,7 +68,7 @@ export default function Header() {
       href: '/news', 
       label: '소식/알림',
       subItems: [
-        { href: '/board', label: '공지사항 (통합)', icon: '📢' },
+        { href: '/board?category=notice', label: '공지사항', icon: '📢' },
         { href: '/board?category=press', label: '보도자료 (통합)', icon: '📰' },
         { href: '/board?category=event', label: '이벤트 (통합)', icon: '🎉' }
       ]

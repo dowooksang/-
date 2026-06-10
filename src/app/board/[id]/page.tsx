@@ -50,7 +50,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
 
           <footer className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
             <Link
-              href="/board"
+              href={`/board?category=${post.category || 'free'}`}
               className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
             >
               목록

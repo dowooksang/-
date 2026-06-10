@@ -7,7 +7,8 @@ import { PenSquare } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 const CATEGORY_NAMES: Record<string, { title: string, desc: string }> = {
-  free: { title: '자유게시판', desc: '자유롭게 소통하는 공간입니다.' },
+  notice: { title: '공지사항', desc: '사단법인 직장인밴드연합회의 공식 공지사항 및 안내입니다.' },
+  free: { title: '소통 (자유게시판)', desc: '자유롭게 소통하고 이야기를 나누는 공간입니다.' },
   greeting: { title: '가입인사', desc: '새로 오신 회원님들의 가입인사 공간입니다.' },
   promotion: { title: '동호회(클럽) 홍보', desc: '소속 동호회나 클럽을 홍보해보세요.' },
   market: { title: '악기/장비 장터', desc: '중고 악기나 장비를 거래하는 공간입니다.' },
