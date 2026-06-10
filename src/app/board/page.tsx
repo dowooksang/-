@@ -74,6 +74,8 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                           <time dateTime={post.created_at}>
                             {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}
                           </time>
+                          <span className="text-gray-300">|</span>
+                          <span>조회 {post.views || 0}</span>
                         </div>
                       </div>
                     </div>

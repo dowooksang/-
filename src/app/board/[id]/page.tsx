@@ -18,6 +18,13 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
+  // 조회수 1 증가 처리
+  const currentViews = (post.views || 0) + 1;
+  await supabase
+    .from('posts')
+    .update({ views: currentViews })
+    .eq('id', resolvedParams.id);
+
   return (
     <div className="bg-white flex-1 w-full flex justify-center py-12">
       <div className="max-w-6xl w-full px-6">
@@ -38,6 +45,8 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
                   year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
                 })}
               </time>
+              <span className="text-gray-300">|</span>
+              <span>조회 {currentViews}</span>
             </div>
           </header>
 
