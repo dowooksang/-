@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS public.posts (
   content     text        NOT NULL,
   author      text        NOT NULL,
   author_id   uuid        REFERENCES public.users(id) ON DELETE SET NULL,
+  category    text        NOT NULL DEFAULT 'free',
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
