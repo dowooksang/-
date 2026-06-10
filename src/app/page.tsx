@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import Calendar from '@/components/Calendar';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Supabase에서 최근 게시물 5개 가져오기
@@ -187,14 +190,18 @@ export default async function Home() {
                <Link href="/news" className="text-xs text-gray-400 hover:text-white transition-colors">더보기 &gt;</Link>
             </div>
             <ul className="flex flex-col gap-3.5">
-              {recentPosts.slice(0, 3).map(post => (
-                <li key={post.id}>
-                  <Link href={`/board/${post.id}`} className="group flex items-center text-sm text-gray-300 hover:text-white transition-colors">
-                    <span className="text-accent mr-2 opacity-50 group-hover:opacity-100 transition-opacity">·</span> 
-                    <span className="truncate group-hover:underline underline-offset-4">{post.title}</span>
-                  </Link>
-                </li>
-              ))}
+              {recentPosts.length === 0 ? (
+                <li className="text-sm text-gray-500 text-center py-4">등록된 공지사항이 없습니다.</li>
+              ) : (
+                recentPosts.slice(0, 3).map(post => (
+                  <li key={post.id}>
+                    <Link href={`/board/${post.id}`} className="group flex items-center text-sm text-gray-300 hover:text-white transition-colors">
+                      <span className="text-accent mr-2 opacity-50 group-hover:opacity-100 transition-opacity">·</span> 
+                      <span className="truncate group-hover:underline underline-offset-4">{post.title}</span>
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
         </div>
@@ -278,31 +285,7 @@ export default async function Home() {
             </div>
           </div>
           
-          <div className="bg-primary border border-white/10 rounded-xl p-6 shadow-xl flex-1 flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <button className="text-gray-400 hover:text-white">&lt;</button>
-              <span className="text-xl font-bold">2026. 04</span>
-              <button className="text-gray-400 hover:text-white">&gt;</button>
-            </div>
-            
-            {/* Minimal Calendar mock */}
-            <div className="grid grid-cols-7 gap-1 text-center text-xs mb-4 text-gray-400">
-              <span className="text-red-400">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span className="text-blue-400">토</span>
-            </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium">
-              {Array.from({length: 30}).map((_, i) => (
-                <div key={i} className={`py-2 rounded-full cursor-pointer hover:bg-white/20 ${i===17 ? 'bg-accent text-primary font-bold' : i===24 ? 'bg-white/20 font-bold border border-white/40' : ''}`}>
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-white/10">
-              <p className="text-sm text-accent font-bold mb-1">04.18 (토)</p>
-              <p className="text-base text-white">서울 강북/성동권 봄맞이 오픈마이크</p>
-              <p className="text-xs text-gray-500 mt-1">@ 홍대 클럽 롤링홀</p>
-            </div>
-          </div>
+          <Calendar />
         </div>
       </section>
 
