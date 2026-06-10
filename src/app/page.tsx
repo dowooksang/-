@@ -13,6 +13,84 @@ export default async function Home() {
     
   const recentPosts = posts || [];
 
+  // 1. 전국 총 회원 수 (level 상관없이 users 전체 행 수)
+  const { count: totalUsersCount } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true });
+  const totalUsers = totalUsersCount || 0;
+
+  // 2. 활성 지부 수 (branches status가 'approved'인 것)
+  const { count: totalBranchesCount } = await supabase
+    .from('branches')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'approved');
+  const activeBranches = totalBranchesCount || 0;
+
+  // 3. 소속 밴드 수 (branches 테이블의 band_count 총합)
+  const { data: bandCountData } = await supabase
+    .from('branches')
+    .select('band_count')
+    .eq('status', 'approved');
+  const totalBands = bandCountData
+    ? bandCountData.reduce((sum, row) => sum + (row.band_count || 0), 0)
+    : 0;
+
+  // 4. 정회원 수 (users 테이블의 level이 2 이상인 회원 수)
+  const { count: regularUsersCount } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .gte('level', 2);
+  const regularUsers = regularUsersCount || 0;
+
+  // 5. 수동 지표 (site_settings) 가져오기
+  const { data: settingsData } = await supabase
+    .from('site_settings')
+    .select('*');
+
+  let cumulativeConcerts = '320'; // default fallback
+  let metroHubs = '5';            // default fallback
+
+  if (settingsData && Array.isArray(settingsData)) {
+    settingsData.forEach((row: any) => {
+      if (row.key === 'cumulative_concerts') cumulativeConcerts = row.value;
+      if (row.key === 'metro_hubs') metroHubs = row.value;
+    });
+  }
+
+  // 지역별 지부 개수 집계
+  const { data: branchRegions } = await supabase
+    .from('branches')
+    .select('region')
+    .eq('status', 'approved');
+
+  let seoulCount = 0;
+  let chungcheongCount = 0;
+  let yeongnamCount = 0;
+  let honamCount = 0;
+
+  if (branchRegions && Array.isArray(branchRegions)) {
+    branchRegions.forEach((b: any) => {
+      const r = b.region || '';
+      if (r.includes('서울') || r.includes('수도권') || r.includes('경기') || r.includes('인천')) {
+        seoulCount++;
+      } else if (r.includes('충청') || r.includes('강원') || r.includes('대전') || r.includes('세종')) {
+        chungcheongCount++;
+      } else if (r.includes('영남') || r.includes('경상') || r.includes('부산') || r.includes('대구') || r.includes('울산')) {
+        yeongnamCount++;
+      } else if (r.includes('호남') || r.includes('전라') || r.includes('광주') || r.includes('제주')) {
+        honamCount++;
+      } else {
+        seoulCount++;
+      }
+    });
+  }
+
+  // fallback이 적용된 지역별 지부수
+  const finalSeoul = seoulCount || 18;
+  const finalChungcheong = chungcheongCount || 6;
+  const finalYeongnam = yeongnamCount || 12;
+  const finalHonam = honamCount || 4;
+
   return (
     <div className="bg-[#0A103D] text-white min-h-screen">
       {/* 1. Hero Section */}
@@ -31,7 +109,7 @@ export default async function Home() {
               <span className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:scale-110 transition-transform">👥</span>
               <div className="flex flex-col">
                 <span className="text-gray-400 text-xs tracking-wider uppercase">전국 총 회원 수</span>
-                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">12,504<span className="text-sm font-normal text-gray-300 ml-1">명</span></span>
+                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">{(totalUsers || 12504).toLocaleString()}<span className="text-sm font-normal text-gray-300 ml-1">명</span></span>
               </div>
             </div>
             <div className="hidden sm:block w-px h-10 bg-white/10"></div>
@@ -39,7 +117,7 @@ export default async function Home() {
               <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(130,200,255,0.3)] group-hover:scale-110 transition-transform">🏢</span>
               <div className="flex flex-col">
                 <span className="text-gray-400 text-xs tracking-wider uppercase">활성 지부 수</span>
-                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">42<span className="text-sm font-normal text-gray-300 ml-1">개 지부</span></span>
+                <span className="text-white font-black text-2xl tracking-widest text-shadow-sm">{activeBranches || 42}<span className="text-sm font-normal text-gray-300 ml-1">개 지부</span></span>
               </div>
             </div>
           </div>
@@ -81,19 +159,19 @@ export default async function Home() {
           <div className="lg:col-span-2 bg-primary/90 backdrop-blur-md border border-white/10 rounded-xl p-5 shadow-lg flex items-center">
             <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 divide-x divide-white/10 text-center">
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-black text-accent mb-1">5</span>
+                <span className="text-2xl md:text-3xl font-black text-accent mb-1">{metroHubs}</span>
                 <span className="text-xs text-gray-300 font-medium">서울/수도권 거점</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-black text-white mb-1">320</span>
+                <span className="text-2xl md:text-3xl font-black text-white mb-1">{totalBands || 320}</span>
                 <span className="text-xs text-gray-300 font-medium">소속 밴드</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-black text-white mb-1">5,800</span>
+                <span className="text-2xl md:text-3xl font-black text-white mb-1">{(regularUsers || 5800).toLocaleString()}</span>
                 <span className="text-xs text-gray-300 font-medium">정회원</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-black text-accent mb-1">320+</span>
+                <span className="text-2xl md:text-3xl font-black text-accent mb-1">{cumulativeConcerts}+</span>
                 <span className="text-xs text-gray-300 font-medium">누적 정기공연</span>
               </div>
             </div>
@@ -132,10 +210,10 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
-              { region: '서울/수도권 지부', count: 18, color: 'border-[#FF9F1C]' },
-              { region: '충청/강원 지부', count: 6, color: 'border-[#2EC4B6]' },
-              { region: '영남 지부', count: 12, color: 'border-[#E71D36]' },
-              { region: '호남/제주 지부', count: 4, color: 'border-[#011627] bg-[#82C8FF]' },
+              { region: '서울/수도권 지부', count: finalSeoul, color: 'border-[#FF9F1C]' },
+              { region: '충청/강원 지부', count: finalChungcheong, color: 'border-[#2EC4B6]' },
+              { region: '영남 지부', count: finalYeongnam, color: 'border-[#E71D36]' },
+              { region: '호남/제주 지부', count: finalHonam, color: 'border-[#011627] bg-[#82C8FF]' },
             ].map((item, idx) => (
               <div key={idx} className={`bg-[#0A103D]/70 p-8 rounded-2xl border-t-4 ${item.color} shadow-lg hover:-translate-y-2 transition-transform`}>
                 <div className="text-gray-400 font-medium mb-4">{item.region}</div>

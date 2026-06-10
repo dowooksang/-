@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import SettingsForm from '@/components/SettingsForm';
 
 /**
  * 최고관리자 전용 대시보드 – Tailwind CSS 기반 디자인
@@ -56,10 +57,22 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-8">
-        <h1 className="text-3xl font-bold text-gray-800 text-center leading-normal">
-          Culture Club 24 최고관리자님, 환영합니다!<br />오늘 하루도 화이팅입니다!
-        </h1>
+      <main className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-8 items-start justify-center mt-12">
+          {/* Welcome Message Card */}
+          <div className="flex-1 bg-white p-8 rounded-2xl shadow-md border border-gray-100 flex flex-col items-center justify-center text-center min-h-[340px]">
+            <span className="text-6xl mb-4">👑</span>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-800 leading-normal">
+              Culture Club 24<br />최고관리자님, 환영합니다!
+            </h1>
+            <p className="text-gray-500 mt-4 text-sm font-medium">오늘 하루도 연합회를 위해 힘내주세요! 화이팅입니다!</p>
+          </div>
+          
+          {/* Settings Form Card */}
+          <div className="flex-1 w-full">
+            <SettingsForm />
+          </div>
+        </div>
       </main>
     </div>
   );

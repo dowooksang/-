@@ -99,9 +99,8 @@ export default function SignupPage() {
           placeholder="연락처"
           value={form.phone}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-gray=700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        // 소속 지부 입력 필드 제거됨
         <button
           type="submit"
           className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 rounded transition-colors"
