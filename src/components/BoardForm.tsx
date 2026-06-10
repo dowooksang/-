@@ -53,6 +53,14 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
         return;
       }
 
+      // 준회원(LV1_GUEST) 권한 검사: 가입인사(greeting) 외에 글쓰기 시도 차단
+      const userLevel = user.level ?? UserLevel.LV1_GUEST;
+      if (userLevel < UserLevel.LV2_MEMBER && category !== 'greeting') {
+        alert('준회원은 가입인사 게시판에만 글을 작성할 수 있습니다.');
+        setIsLoading(false);
+        return;
+      }
+
       if (isEdit) {
         const { error } = await supabase
           .from('posts')
@@ -71,6 +79,7 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
             title: formData.title,
             content: formData.content,
             author: user.nickname || '익명',
+            author_id: user.id, // RLS 정책 및 작성자 데이터 매핑을 위해 author_id 추가
             category: category
           }])
           .select()

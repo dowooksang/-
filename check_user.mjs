@@ -1,6 +1,9 @@
 // check_user.mjs
 import { createClient } from '@supabase/supabase-js';
 
+// Node.js 환경에서 WebSocket 에러 방지를 위해 mock 정의
+globalThis.WebSocket = class {};
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -24,3 +27,4 @@ if (data) {
 } else {
   console.log('❌ User not found');
 }
+

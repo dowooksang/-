@@ -1,3 +1,4 @@
+'use client';
 // src/lib/useAuth.ts
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
@@ -7,6 +8,7 @@ type User = {
   email: string;
   level?: number;
   nickname?: string;
+  name?: string;
   createdAt?: string;
   position?: string;
 };
@@ -37,19 +39,81 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // DB에서 유저 정보를 조회하되, 없으면 자동으로 복구/생성(Self-healing)해주는 헬퍼
+  const fetchOrCreateDbUser = async (userId: string, email: string, metadata: any) => {
+    if (!userId) return null;
+    try {
+      // 1순위: id (userId)로 조회하여 RLS 보안 정책 통과 확률과 정확도를 극대화합니다.
+      let { data: dbData, error: dbErr } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      // 2순위: id로 찾지 못했으나 이메일 정보가 있다면 이메일로도 보완 조회합니다.
+      if ((dbErr || !dbData) && email) {
+        const { data: emailData, error: emailErr } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .single();
+        if (!emailErr && emailData) {
+          dbData = emailData;
+          dbErr = null;
+        }
+      }
+
+      if (!dbErr && dbData) {
+        return dbData;
+      }
+
+      // 데이터가 존재하지 않거나 스키마 캐시 문제 등으로 조회가 실패한 경우 자체 복구
+      if (dbErr && (dbErr.code === 'PGRST116' || dbErr.message.includes('schema cache') || dbErr.message.includes('public.users'))) {
+        const defaultNickname = metadata?.nickname || metadata?.name || email.split('@')[0];
+        const defaultName = metadata?.name || email.split('@')[0];
+        
+        const { data: insertData, error: insertErr } = await supabase
+          .from('users')
+          .insert({
+            id: userId,
+            email: email,
+            nickname: defaultNickname,
+            name: defaultName,
+            status: 'pending',
+            level: 1
+          })
+          .select()
+          .single();
+        
+        if (!insertErr && insertData) {
+          return insertData;
+        } else {
+          console.error('Self-healing: user creation failed in DB:', insertErr);
+        }
+      }
+    } catch (e) {
+      console.error('Self-healing unexpected error:', e);
+    }
+    return null;
+  };
+
   // ① Initialise: try to recover Supabase session using official getSession()
   useEffect(() => {
     const init = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (!error && session?.user) {
+          const email = session.user.email ?? '';
+          const dbUser = await fetchOrCreateDbUser(session.user.id, email, session.user.user_metadata);
+
           setUser({
             id: session.user.id,
-            email: session.user.email ?? '',
-            level: session.user.user_metadata?.level,
-            nickname: session.user.user_metadata?.nickname || session.user.user_metadata?.name || '',
-            createdAt: session.user.created_at,
-            position: session.user.user_metadata?.position,
+            email: email,
+            level: dbUser ? dbUser.level : 1,
+            nickname: dbUser ? dbUser.nickname : (session.user.user_metadata?.nickname || session.user.user_metadata?.name || email.split('@')[0]),
+            name: dbUser ? dbUser.name : (session.user.user_metadata?.name || session.user.user_metadata?.full_name),
+            createdAt: dbUser ? dbUser.created_at : session.user.created_at,
+            position: dbUser ? dbUser.position : session.user.user_metadata?.position,
           });
           setIsLoaded(true);
           return;
@@ -58,10 +122,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Session recovery error:', err);
       }
       
+      // 쿠키 기반 이메일이 존재할 시 DB에서 온전한 회원 정보를 복구하여 Level과 닉네임이 정상 적용되도록 합니다.
       const emailFromCookie = getCookie('email');
       if (emailFromCookie) {
-        setUser({ id: '', email: emailFromCookie } as User);
+        try {
+          const { data: dbUser, error: dbErr } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', emailFromCookie)
+            .single();
+
+          if (!dbErr && dbUser) {
+            setUser({
+              id: dbUser.id,
+              email: emailFromCookie,
+              level: dbUser.level,
+              nickname: dbUser.nickname,
+              name: dbUser.name,
+              createdAt: dbUser.created_at,
+              position: dbUser.position,
+            });
+            setIsLoaded(true);
+            return;
+          }
+        } catch (e) {
+          console.error('Cookie-based session recovery failed:', e);
+        }
       }
+      
+      setUser(null);
       setIsLoaded(true);
     };
     init();
@@ -69,15 +158,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // ② Listen for Supabase auth changes (sign‑in, sign‑out, token refresh)
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
+        const email = session.user.email ?? '';
+        const dbUser = await fetchOrCreateDbUser(session.user.id, email, session.user.user_metadata);
+
         setUser({
           id: session.user.id,
-          email: session.user.email ?? '',
-          level: session.user.user_metadata?.level,
-          nickname: session.user.user_metadata?.nickname || session.user.user_metadata?.name || '',
-          createdAt: session.user.created_at,
-          position: session.user.user_metadata?.position,
+          email: email,
+          level: dbUser ? dbUser.level : 1,
+          nickname: dbUser ? dbUser.nickname : (session.user.user_metadata?.nickname || session.user.user_metadata?.name || email.split('@')[0]),
+          name: dbUser ? dbUser.name : (session.user.user_metadata?.name || session.user.user_metadata?.full_name),
+          createdAt: dbUser ? dbUser.created_at : session.user.created_at,
+          position: dbUser ? dbUser.position : session.user.user_metadata?.position,
         });
       } else {
         setUser(null);
@@ -98,13 +191,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     if (data?.user) {
+      const userEmail = data.user.email ?? '';
+      const dbUser = await fetchOrCreateDbUser(data.user.id, userEmail, data.user.user_metadata);
+
       const loggedUser = {
         id: data.user.id,
-        email: data.user.email ?? '',
-        level: data.user.user_metadata?.level,
-        nickname: data.user.user_metadata?.nickname || data.user.user_metadata?.name || '',
-        createdAt: data.user.created_at,
-        position: data.user.user_metadata?.position,
+        email: userEmail,
+        level: dbUser ? dbUser.level : 1,
+        nickname: dbUser ? dbUser.nickname : (data.user.user_metadata?.nickname || data.user.user_metadata?.name || userEmail.split('@')[0]),
+        name: dbUser ? dbUser.name : (data.user.user_metadata?.name || data.user.user_metadata?.full_name),
+        createdAt: dbUser ? dbUser.created_at : data.user.created_at,
+        position: dbUser ? dbUser.position : data.user.user_metadata?.position,
       };
       setUser(loggedUser);
       localStorage.setItem('jb_session_email', loggedUser.email);
@@ -136,11 +233,17 @@ export const useAuth = () => useContext(AuthContext);
 export const getLevelName = (level?: number) => {
   switch (level) {
     case 6:
-      return '관리자';
+      return '최고관리자';
     case 5:
       return '슈퍼관리자';
     case 4:
       return '운영자';
+    case 3:
+      return '우수회원';
+    case 2:
+      return '정회원';
+    case 1:
+      return '준회원';
     default:
       return '회원';
   }

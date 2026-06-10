@@ -166,7 +166,7 @@ export default function Header() {
           {isLoaded && user ? (
             <div className="flex items-center gap-4">
               <Link href="/mypage" className="text-sm flex items-center hover:opacity-80 transition-opacity">
-                <span className="text-gray-200 mr-2 font-medium underline-offset-4 hover:underline">{user.nickname}님</span>
+                <span className="text-gray-200 mr-2 font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
                 <span className="bg-white/10 text-accent px-2 py-1 rounded text-xs border border-white/10">
                   {getLevelName(user.level)}
                 </span>
@@ -257,7 +257,7 @@ export default function Header() {
             {isLoaded && user ? (
               <>
                 <Link href="/mypage" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-2 mb-2 py-2 hover:bg-white/5 rounded-lg transition-colors">
-                  <span className="text-white font-medium underline-offset-4 hover:underline">{user.nickname}님</span>
+                  <span className="text-white font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
                   <span className="bg-accent text-[#0A103D] px-2 py-0.5 rounded text-xs font-bold">
                     {getLevelName(user.level)}
                   </span>

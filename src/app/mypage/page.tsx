@@ -62,7 +62,7 @@ export default function MyPage() {
           </div>
           
           <div className="pt-16 pb-8 px-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.nickname}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.name || user.nickname}</h2>
             <p className="text-gray-500 text-sm font-medium">{user.position} 파트</p>
             
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">

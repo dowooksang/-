@@ -31,16 +31,21 @@ export default function SignupPage() {
       return;
     }
     try {
-      const { error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
       });
       if (authError) throw authError;
+      if (!authData?.user) throw new Error('회원가입 처리 중 사용자 정보를 생성하지 못했습니다.');
 
-      const { error: dbError } = await supabase.from('members').insert({
+      const { error: dbError } = await supabase.from('users').insert({
+        id: authData.user.id,
         name: form.name,
         email: form.email,
+        nickname: form.name, // 닉네임 필수값에 이름을 기본값으로 매핑
         phone: form.phone,
+        status: 'pending',   // 승인 대기(pending) 상태로 가입
+        level: 1,            // 준회원(LV1_GUEST = 1) 등급 부여
         created_at: new Date().toISOString(),
       });
       if (dbError) throw dbError;
