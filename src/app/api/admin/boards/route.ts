@@ -14,7 +14,18 @@ const DEFAULT_PERMISSIONS = [
   { category: 'archive', read_level: 2, write_level: 2 },
   { category: 'qa', read_level: 1, write_level: 1 },
   { category: 'press', read_level: 1, write_level: 5 },
-  { category: 'event', read_level: 1, write_level: 5 }
+  { category: 'event', read_level: 1, write_level: 5 },
+  { category: 'gallery', read_level: 1, write_level: 2 },
+  { category: 'video', read_level: 1, write_level: 2 },
+  { category: 'jam', read_level: 1, write_level: 2 },
+  { category: 'group', read_level: 1, write_level: 2 },
+  { category: 'lesson', read_level: 1, write_level: 2 },
+  { category: 'debut', read_level: 1, write_level: 2 },
+  { category: 'branch', read_level: 1, write_level: 5 },
+  { category: 'branch_news', read_level: 1, write_level: 4 },
+  { category: 'council', read_level: 4, write_level: 4 },
+  { category: 'share_gallery', read_level: 1, write_level: 2 },
+  { category: 'volunteer', read_level: 1, write_level: 1 }
 ];
 
 /**

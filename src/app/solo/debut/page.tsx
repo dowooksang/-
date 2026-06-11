@@ -1,41 +1,73 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/useAuth';
 import { UserLevel } from '@/lib/store';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function DebutPage() {
   const { user, isLoaded } = useAuth();
+  const [writeLevel, setWriteLevel] = useState<number | null>(null);
 
-  if (!isLoaded) return <div className="py-20 text-center text-white">로딩 중...</div>;
+  useEffect(() => {
+    const fetchWriteLevel = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('board_permissions')
+          .select('write_level')
+          .eq('category', 'debut')
+          .single();
+        if (!error && data) {
+          setWriteLevel(data.write_level);
+        } else {
+          setWriteLevel(2); // fallback
+        }
+      } catch (err) {
+        setWriteLevel(2);
+      }
+    };
+    fetchWriteLevel();
+  }, []);
+
+  if (!isLoaded || writeLevel === null) return <div className="py-20 text-center text-white">로딩 중...</div>;
+
+  const levelNames: Record<number, string> = {
+    1: '준회원 (LV1)',
+    2: '정회원 (LV2)',
+    3: '우수회원 (LV3)',
+    4: '지부장급 (LV4)',
+    5: '관리자 (LV5)',
+    6: '최고관리자 (LV6)'
+  };
+  const targetLevelName = levelNames[writeLevel] || '정회원 (LV2)';
 
   return (
     <div className="min-h-screen bg-primary">
       <div className="bg-gradient-to-r from-[#0A103D] via-[#1A2255] to-[#0A103D] py-16 text-center border-b border-white/10">
         <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">무대 데뷔 신청</h1>
-        <p className="text-lg text-gray-300">연합회가 주최하는 연합 공연에서 무대에 오를 기회를 잡으세요!</p>
+        <p className="text-lg text-gray-300">방구석을 벗어나 연합회 주관 콘서트 오프닝 무대에 설 기회를 신청하세요.</p>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-white">신청 현황</h2>
           
-          {user && user.level !== undefined && user.level >= UserLevel.LV2_MEMBER ? (
-            <button className="bg-accent text-[#0A103D] font-bold px-6 py-2.5 rounded-lg hover:bg-[#82C8FF] transition-all shadow-md">
-              데뷔 신청하기
+          {user && user.level !== undefined && user.level >= writeLevel ? (
+            <button className="bg-accent text-[#0A103D] font-bold px-6 py-2.5 rounded-lg hover:bg-[#82C8FF] transition-all shadow-md cursor-pointer">
+              데뷔 무대 신청하기
             </button>
           ) : (
             <button 
-              onClick={() => alert('무대 데뷔 신청은 정회원 이상부터 가능합니다.\n가입 승인을 기다려주세요.')}
+              onClick={() => alert(`무대 신청은 ${targetLevelName} 이상부터 가능합니다.\n가입 승인을 기다려주세요.`)}
               className="bg-white/10 text-gray-400 font-medium px-6 py-2.5 rounded-lg border border-white/10 cursor-not-allowed"
             >
-              신청하기 (정회원 전용)
+              데뷔 무대 신청하기 ({targetLevelName} 전용)
             </button>
           )}
         </div>
         
         <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center text-gray-500">
-          <p>현재 접수 중인 데뷔 신청이 없습니다.</p>
+          <p>등록된 신청서가 없습니다. 용기 내어 첫 번째 무대 데뷔 신청의 주인공이 되어보세요!</p>
         </div>
       </div>
     </div>

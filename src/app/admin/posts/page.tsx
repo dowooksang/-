@@ -15,7 +15,18 @@ const CATEGORY_MAP: Record<string, string> = {
   archive: '📁 활동 자료실',
   qa: '❓ 건의 및 Q&A',
   press: '📰 보도자료',
-  event: '🎉 이벤트'
+  event: '🎉 이벤트',
+  gallery: '📸 활동갤러리',
+  video: '🎬 공연영상',
+  jam: '🎸 방구석 릴레이 잼',
+  group: '🤝 소모임 및 매칭',
+  lesson: '📖 레슨 및 장비리뷰',
+  debut: '🎤 무대 데뷔 신청',
+  branch: '🏢 지부 모집 및 신청',
+  branch_news: '📰 지부별 활동 소식',
+  council: '🤝 지부장 회의실',
+  share_gallery: '📸 재능기부/봉사 기록',
+  volunteer: '🙌 봉사 요청하기'
 };
 
 const LEVEL_OPTIONS = [

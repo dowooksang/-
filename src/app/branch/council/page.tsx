@@ -4,21 +4,53 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/useAuth';
 import { UserLevel } from '@/lib/store';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function BranchCouncilPage() {
   const { user, isLoaded } = useAuth();
-  
-  if (!isLoaded) return <div className="min-h-screen bg-[#0A103D] text-white flex items-center justify-center">로딩 중...</div>;
+  const [readLevel, setReadLevel] = useState<number | null>(null);
 
-  // 권한 체크: 지부장급(LV4_MANAGER) 이상만 접근 가능
-  if (!user || user.level === undefined || user.level < UserLevel.LV4_MANAGER) {
+  useEffect(() => {
+    const fetchReadLevel = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('board_permissions')
+          .select('read_level')
+          .eq('category', 'council')
+          .single();
+        if (!error && data) {
+          setReadLevel(data.read_level);
+        } else {
+          setReadLevel(4); // fallback (지부장급 LV4)
+        }
+      } catch (err) {
+        setReadLevel(4);
+      }
+    };
+    fetchReadLevel();
+  }, []);
+  
+  if (!isLoaded || readLevel === null) return <div className="min-h-screen bg-[#0A103D] text-white flex items-center justify-center">로딩 중...</div>;
+
+  // 권한 체크: DB에서 가져온 readLevel 이상만 접근 가능
+  if (!user || user.level === undefined || user.level < readLevel) {
+    const levelNames: Record<number, string> = {
+      1: '준회원 (LV1)',
+      2: '정회원 (LV2)',
+      3: '우수회원 (LV3)',
+      4: '지부장급 (LV4)',
+      5: '관리자 (LV5)',
+      6: '최고관리자 (LV6)'
+    };
+    const targetLevelName = levelNames[readLevel] || '지부장급 (LV4)';
+
     return (
       <div className="min-h-screen bg-[#0A103D] flex items-center justify-center p-6 text-center">
         <div className="bg-white/5 p-12 rounded-2xl border border-white/10 max-w-lg w-full backdrop-blur-md">
           <div className="text-6xl mb-6">⛔</div>
           <h1 className="text-2xl font-bold text-white mb-4">접근 권한이 없습니다</h1>
           <p className="text-gray-400 mb-8 leading-relaxed">
-            해당 게시판은 연합회 공식 <b>승인을 받은 지부장 및 운영진 전용</b> 비밀 게시판입니다.<br/>
+            해당 게시판은 연합회 공식 <b>승인을 받은 {targetLevelName} 전용</b> 비밀 게시판입니다.<br/>
             일반 회원 및 대기 중인 신청자는 열람하실 수 없습니다.
           </p>
           <Link href="/" className="bg-accent text-[#0A103D] px-8 py-3 rounded-lg font-bold hover:bg-[#82C8FF] transition-colors">
@@ -30,7 +62,7 @@ export default function BranchCouncilPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen text-black">
       {/* 헤더 섹션 */}
       <div className="bg-[#0A103D] text-white py-16 px-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none"></div>
