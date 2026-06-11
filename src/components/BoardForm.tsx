@@ -53,10 +53,40 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
         return;
       }
 
-      // 준회원(LV1_GUEST) 권한 검사: 가입인사(greeting) 외에 글쓰기 시도 차단
+      // 게시판 쓰기 권한 등급 동적 조회 및 최종 검증
+      let writeLevel = 2; // 기본값
+      try {
+        const { data: permData } = await supabase
+          .from('board_permissions')
+          .select('write_level')
+          .eq('category', category)
+          .single();
+        if (permData) {
+          writeLevel = permData.write_level;
+        } else {
+          const fallbacks: Record<string, number> = {
+            notice: 5, free: 2, greeting: 1, promotion: 2, market: 2, archive: 2, qa: 1, press: 5, event: 5
+          };
+          writeLevel = fallbacks[category] ?? 2;
+        }
+      } catch (e) {
+        const fallbacks: Record<string, number> = {
+          notice: 5, free: 2, greeting: 1, promotion: 2, market: 2, archive: 2, qa: 1, press: 5, event: 5
+        };
+        writeLevel = fallbacks[category] ?? 2;
+      }
+
       const userLevel = user.level ?? UserLevel.LV1_GUEST;
-      if (userLevel < UserLevel.LV2_MEMBER && category !== 'greeting') {
-        alert('준회원은 가입인사 게시판에만 글을 작성할 수 있습니다.');
+      if (userLevel < writeLevel) {
+        const levelNames: Record<number, string> = {
+          1: '준회원 (LV1)',
+          2: '정회원 (LV2)',
+          3: '우수회원 (LV3)',
+          4: '지부장급 (LV4)',
+          5: '관리자 (LV5)',
+          6: '최고관리자 (LV6)'
+        };
+        alert(`이 게시판에 글을 작성할 권한이 없습니다. (${levelNames[writeLevel] || `LV${writeLevel}`} 이상 작성 가능)`);
         setIsLoading(false);
         return;
       }

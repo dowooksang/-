@@ -79,6 +79,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: email,
             nickname: defaultNickname,
             name: defaultName,
+            phone: metadata?.phone || null,
+            band_name: metadata?.band_name || '소속 없음',
+            position: metadata?.position || null,
+            address: metadata?.address || null,
             status: 'pending',
             level: 1
           })

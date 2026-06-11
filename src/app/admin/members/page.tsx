@@ -237,7 +237,7 @@ export default function AdminMembersPage() {
                     <td className="p-5 text-black font-black">{m.address || '-'}</td>
                     <td className="p-5 text-black font-black">{m.position}</td>
                     <td className="p-5 text-black font-extrabold">
-                      {new Date(m.createdAt).toLocaleDateString()}
+                      {new Date(m.created_at).toLocaleDateString()}
                     </td>
                     <td className="p-5 text-center">
                       <button 
