@@ -24,7 +24,7 @@ const getEventForDate = (date: Date) => {
     return {
       title: '전국 지부 연합 버스킹 & 정기 합주',
       time: '15:00',
-      location: '홍대 롤링홀 & 지부별 지정 연습실',
+      location: '지부별 지정 연습실 & 동네 광장',
     };
   }
 
@@ -40,7 +40,7 @@ const getEventForDate = (date: Date) => {
   // 매월 25일 일정
   if (dayOfMonth === 25) {
     return {
-      title: '이달의 우수 밴드 영상 심사 및 발표',
+      title: '이달의 우수 동호회 영상 심사 및 발표',
       time: '18:00',
       location: '공식 홈페이지 공지사항',
     };
@@ -67,8 +67,8 @@ export default function Calendar() {
 
   if (!currentDate || !selectedDate) {
     return (
-      <div className="bg-[#111827]/90 border border-white/10 rounded-xl p-6 shadow-xl flex-1 flex items-center justify-center min-h-[350px]">
-        <div className="animate-pulse text-gray-400">달력을 불러오는 중...</div>
+      <div className="bg-white border border-[#EBE4D8] rounded-xl p-6 shadow-md flex-1 flex items-center justify-center min-h-[350px]">
+        <div className="animate-pulse text-[#7A6354]">달력을 불러오는 중...</div>
       </div>
     );
   }
@@ -124,22 +124,22 @@ export default function Calendar() {
   const selectedDayOfWeek = WEEKDAYS[selectedDate.getDay()];
 
   return (
-    <div className="bg-[#111827]/90 border border-white/10 rounded-xl p-6 shadow-xl flex-1 flex flex-col transition-all duration-300 hover:border-accent/40">
+    <div className="bg-white border border-[#EBE4D8] rounded-xl p-6 shadow-md flex-1 flex flex-col transition-all duration-300 hover:border-[#D2B48C]">
       {/* 캘린더 헤더 */}
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={handlePrevMonth}
-          className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors"
+          className="text-[#7A6354] hover:text-[#3E332E] hover:bg-[#F5EBE6] p-2 rounded-full transition-colors"
           aria-label="이전 달"
         >
           &lt;
         </button>
-        <span className="text-xl font-bold tracking-wider">
+        <span className="text-xl font-bold tracking-wider text-[#3E332E]">
           {currentYear}. {String(currentMonth + 1).padStart(2, '0')}
         </span>
         <button
           onClick={handleNextMonth}
-          className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors"
+          className="text-[#7A6354] hover:text-[#3E332E] hover:bg-[#F5EBE6] p-2 rounded-full transition-colors"
           aria-label="다음 달"
         >
           &gt;
@@ -147,12 +147,12 @@ export default function Calendar() {
       </div>
 
       {/* 요일 헤더 */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs mb-4 text-gray-400 font-bold border-b border-white/5 pb-2">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs mb-4 text-[#7A6354] font-bold border-b border-[#EBE4D8] pb-2">
         {WEEKDAYS.map((day, idx) => (
           <span
             key={day}
             className={
-              idx === 0 ? 'text-red-400' : idx === 6 ? 'text-blue-400' : 'text-gray-400'
+              idx === 0 ? 'text-red-500' : idx === 6 ? 'text-blue-500' : 'text-[#7A6354]'
             }
           >
             {day}
@@ -176,12 +176,12 @@ export default function Calendar() {
             <button
               key={`day-${day}`}
               onClick={() => handleDateClick(day)}
-              className={`py-2 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center w-8 h-8 mx-auto hover:bg-white/10 ${
+              className={`py-2 rounded-full cursor-pointer transition-all duration-200 flex items-center justify-center w-8 h-8 mx-auto hover:bg-[#F5EBE6] ${
                 isDaySelected
-                  ? 'bg-accent text-[#0A103D] font-bold shadow-[0_0_12px_rgba(130,200,255,0.6)]'
+                  ? 'bg-[#E89C5E] text-white font-bold shadow-md'
                   : isDayToday
-                  ? 'bg-white/20 text-white font-bold border border-white/40'
-                  : 'text-gray-300'
+                  ? 'bg-[#F5EBE6] text-[#3E332E] font-bold border border-[#D2B48C]'
+                  : 'text-[#4A3D36]'
               }`}
             >
               {day}
@@ -191,16 +191,16 @@ export default function Calendar() {
       </div>
 
       {/* 선택된 날짜의 일정 상세 */}
-      <div className="mt-8 pt-6 border-t border-white/10 transition-all duration-300 animate-[fadeIn_0.3s_ease-out]">
-        <p className="text-sm text-accent font-bold mb-1 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
+      <div className="mt-8 pt-6 border-t border-[#EBE4D8] transition-all duration-300 animate-[fadeIn_0.3s_ease-out]">
+        <p className="text-sm text-[#E89C5E] font-bold mb-1 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E89C5E] animate-ping" />
           {String(selectedDate.getMonth() + 1).padStart(2, '0')}.
           {String(selectedDate.getDate()).padStart(2, '0')} ({selectedDayOfWeek})
         </p>
-        <h4 className="text-base text-white font-semibold transition-colors duration-300">
+        <h4 className="text-base text-[#3E332E] font-semibold transition-colors duration-300">
           {currentEvent.title}
         </h4>
-        <div className="flex flex-col gap-0.5 mt-2 text-xs text-gray-400">
+        <div className="flex flex-col gap-0.5 mt-2 text-xs text-[#7A6354]">
           <span>🕒 시간: {currentEvent.time}</span>
           <span>📍 장소: {currentEvent.location}</span>
         </div>
