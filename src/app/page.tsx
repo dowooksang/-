@@ -143,7 +143,7 @@ export default async function Home() {
               <span className="text-[#E89C5E] underline decoration-4 decoration-[#E89C5E]/40 underline-offset-8">함께 만드는</span> 우리들의 음악 이야기
             </h1>
             <p className="text-base md:text-lg text-[#5A4535] font-normal mb-8 leading-relaxed max-w-xl text-pretty">
-              사단법인 아마추어 악기 동호회 연합이 전국의 모든 일상 속 연주자들을 위해 따뜻하고 친근한 쉼터가 되어 드립니다. 
+              사단법인직장인밴드연합회가 전국의 모든 일상 속 연주자들을 위해 따뜻하고 친근한 쉼터가 되어 드립니다. 
               퇴근 후의 즐거운 소담 합주, 골목길 광장에서 나누는 버스킹의 소박한 기쁨을 지금 만나보세요.
             </p>
             <blockquote className="border-l-4 border-[#E89C5E] pl-6 text-[#5A4535] italic text-base md:text-lg mb-8 font-serif relative">

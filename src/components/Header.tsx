@@ -116,7 +116,7 @@ export default function Header() {
           <div className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden relative">
             <Image 
               src="/logo.png" 
-              alt="사단법인 아마추어 악기 동호회 연합 로고" 
+              alt="사단법인직장인밴드연합회 로고" 
               fill
               className="object-contain"
             />
@@ -124,7 +124,7 @@ export default function Header() {
           <div className="flex flex-col justify-center">
             <span className="text-[10px] md:text-xs text-accent font-semibold tracking-wider">사단법인</span>
             <span className="text-lg md:text-xl font-bold tracking-tight group-hover:text-gray-200 transition-colors">
-              아마추어 악기 동호회 연합
+              직장인밴드연합회
             </span>
           </div>
         </Link>
