@@ -165,7 +165,7 @@ export default async function Home() {
             <div className="relative w-full aspect-square max-w-[450px] rounded-3xl overflow-hidden shadow-xl border-[12px] border-white transform rotate-1 hover:rotate-0 transition-transform duration-500 bg-white">
               <Image 
                 src="/images/club_hero_banner.png"
-                alt="아늑한 동호회실에서 통기타, 색소폰, 건반을 함께 즐기는 한국인 아마추어 연주자들"
+                alt="드럼, 일렉기타, 베이스, 신디사이저가 구비된 아늑하고 따뜻한 우드 톤의 밴드 합주실 전경"
                 fill
                 priority
                 className="object-cover"
@@ -337,7 +337,7 @@ export default async function Home() {
           <div className="md:w-1/3 bg-cover bg-center h-64 md:h-auto min-h-[250px] relative">
             <Image 
               src="/images/rising_star.png" 
-              alt="통기타를 든 인자한 미소의 이달의 이웃 연주자" 
+              alt="따뜻한 아침 햇살이 비치는 창가에 놓인 빈티지 어쿠스틱 통기타와 음악 악보" 
               fill 
               className="object-cover"
             />
