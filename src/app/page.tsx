@@ -98,35 +98,6 @@ export default async function Home() {
 
   return (
     <div className="bg-[#FAF7F2] text-[#3E332E] min-h-screen font-sans selection:bg-[#E89C5E]/20">
-      {/* 1. 전국 회원/동호회 현황 탑 바 */}
-      <div className="w-full bg-[#F3EFE9] border-b border-[#E3DAC9] py-3.5 shadow-xs">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-20 text-sm font-medium text-[#5A4535]">
-          <div className="flex items-center gap-3 group cursor-default">
-            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">👥</span>
-            <div className="flex flex-col">
-              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">함께하는 음악 이웃들</span>
-              <span className="text-[#7A5A44] font-black text-xl">{(totalUsers || 12504).toLocaleString()}<span className="text-xs font-normal text-neutral-500 ml-0.5">명</span></span>
-            </div>
-          </div>
-          <div className="hidden sm:block w-px h-8 bg-[#E3DAC9]"></div>
-          <div className="flex items-center gap-3 group cursor-default">
-            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">🏡</span>
-            <div className="flex flex-col">
-              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">우리 동네 동호회방</span>
-              <span className="text-[#7A5A44] font-black text-xl">{activeBranches || 42}<span className="text-xs font-normal text-neutral-500 ml-0.5">개 지부</span></span>
-            </div>
-          </div>
-          <div className="hidden sm:block w-px h-8 bg-[#E3DAC9]"></div>
-          <div className="flex items-center gap-3 group cursor-default">
-            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">🎸</span>
-            <div className="flex flex-col">
-              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">소담한 악기 소모임</span>
-              <span className="text-[#7A5A44] font-black text-xl">{totalBands || 320}<span className="text-xs font-normal text-neutral-500 ml-0.5">개 팀</span></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 2. Hero Section */}
       <section className="relative py-16 md:py-24 bg-gradient-to-b from-[#FAF7F2] to-[#F3EFE9] overflow-hidden border-b border-[#E3DAC9]">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -390,6 +361,35 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* 전국 회원/동호회 현황 지표 바 (하단 이동) */}
+      <div className="w-full bg-[#F3EFE9] border-t border-[#E3DAC9] py-5 shadow-xs">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-20 text-sm font-medium text-[#5A4535]">
+          <div className="flex items-center gap-3 group cursor-default">
+            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">👥</span>
+            <div className="flex flex-col">
+              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">함께하는 음악 이웃들</span>
+              <span className="text-[#7A5A44] font-black text-xl">{(totalUsers || 12504).toLocaleString()}<span className="text-xs font-normal text-neutral-500 ml-0.5">명</span></span>
+            </div>
+          </div>
+          <div className="hidden sm:block w-px h-8 bg-[#E3DAC9]"></div>
+          <div className="flex items-center gap-3 group cursor-default">
+            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">🏡</span>
+            <div className="flex flex-col">
+              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">우리 동네 동호회방</span>
+              <span className="text-[#7A5A44] font-black text-xl">{activeBranches || 42}<span className="text-xs font-normal text-neutral-500 ml-0.5">개 지부</span></span>
+            </div>
+          </div>
+          <div className="hidden sm:block w-px h-8 bg-[#E3DAC9]"></div>
+          <div className="flex items-center gap-3 group cursor-default">
+            <span className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E3DAC9] flex items-center justify-center text-lg shadow-xs transition-transform group-hover:scale-110 duration-300">🎸</span>
+            <div className="flex flex-col">
+              <span className="text-neutral-500 text-[11px] tracking-wider font-semibold">소담한 악기 소모임</span>
+              <span className="text-[#7A5A44] font-black text-xl">{totalBands || 320}<span className="text-xs font-normal text-neutral-500 ml-0.5">개 팀</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
