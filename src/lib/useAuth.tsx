@@ -105,6 +105,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const init = async () => {
       try {
+        // API Route에서 로그인 시 설정한 httpOnly 쿠키 토큰들을 읽어와 클라이언트 Supabase SDK에 주입합니다.
+        const accessToken = getCookie('sb-access-token');
+        const refreshToken = getCookie('sb-refresh-token');
+        
+        if (accessToken && refreshToken) {
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+        }
+
         const { data: { session }, error } = await supabase.auth.getSession();
         if (!error && session?.user) {
           const email = session.user.email ?? '';
