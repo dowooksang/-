@@ -10,25 +10,9 @@ import { supabase } from '@/lib/supabaseClient';
 
 function WritePageContent() {
   const { user, isLoaded } = useAuth();
-  const [isValidSession, setIsValidSession] = useState<boolean | null>(null);
   const [writeLevel, setWriteLevel] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const category = searchParams.get('category') || 'free';
-
-  useEffect(() => {
-    const verifySession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setIsValidSession(!!session);
-      } catch (err) {
-        console.error('Session validation error:', err);
-        setIsValidSession(false);
-      }
-    };
-    if (isLoaded) {
-      verifySession();
-    }
-  }, [isLoaded]);
 
   // 카테고리별 쓰기 권한 등급 조회
   useEffect(() => {
@@ -60,9 +44,9 @@ function WritePageContent() {
     fetchWriteLevel();
   }, [category]);
 
-  if (!isLoaded || isValidSession === null || writeLevel === null) return <div className="py-20 text-center text-gray-500">로딩 중...</div>;
+  if (!isLoaded || writeLevel === null) return <div className="py-20 text-center text-gray-500">로딩 중...</div>;
 
-  if (!user || !isValidSession) {
+  if (!user) {
     return (
       <div className="bg-white flex-1 w-full flex items-center justify-center py-32 text-black">
         <div className="text-center">

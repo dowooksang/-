@@ -39,7 +39,8 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
       // 폼 제출 직전, 실제 Supabase 세션이 여전히 유효한지 비동기로 최종 검증합니다.
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (sessionError || !session) {
+      // Supabase Auth 세션이 만료된 경우라도 useAuth Context에 user 정보가 온전히 복구되어 있다면 이를 허용합니다.
+      if (!session && !user) {
         alert('로그인 세션이 만료되었거나 올바르지 않습니다. 다시 로그인해 주세요.');
         router.push('/login');
         setIsLoading(false);
