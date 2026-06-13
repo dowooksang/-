@@ -3,14 +3,14 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* 전국 아마추어 악기 동호회의 아늑하고 따뜻한 공간 느낌을 주기 위해 은은한 우드 브라운 톤을 메인(primary)으로 설정 */
-  --color-primary: #4A3B32;         
-  --color-primary-light: #5C4B40;   
-  --color-primary-dark: #362A22;    
+  /* 연하고 아늑한 푸른색감의 에코 테마로 메인(primary) 색상 변경 */
+  --color-primary: #E6F0FA;         
+  --color-primary-light: #F0F7FF;   
+  --color-primary-dark: #1E293B;    
   
-  /* 동네 사람들의 행복하고 즐거운 연주를 표현하기 위해 포근하고 에코 감성 가득한 오렌지/살구색을 강조색(accent)으로 지정 */
-  --color-accent: #E89C5E;          
-  --color-accent-hover: #D98B4D;    
+  /* 신뢰감 있고 시원한 블루를 강조색(accent)으로 지정 */
+  --color-accent: #2563EB;          
+  --color-accent-hover: #1D4ED8;    
   
   --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }

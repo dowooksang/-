@@ -109,7 +109,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-primary text-white shadow-xl border-b-2 border-accent relative">
+    <header className="sticky top-0 z-50 w-full bg-primary text-slate-800 shadow-lg border-b-2 border-accent relative">
       {/* PC & Mobile Top Bar */}
       <div className="max-w-7xl mx-auto px-6 h-20 md:h-28 lg:h-32 flex items-center justify-between">
         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 group">
@@ -123,7 +123,7 @@ export default function Header() {
           </div>
           <div className="flex flex-col justify-center">
             <span className="text-[10px] md:text-xs text-accent font-semibold tracking-wider">사단법인</span>
-            <span className="text-lg md:text-xl font-bold tracking-tight group-hover:text-gray-200 transition-colors">
+            <span className="text-lg md:text-xl font-bold tracking-tight group-hover:text-accent transition-colors">
               직장인밴드연합회
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function Header() {
               <Link 
                 href={link.href} 
                 className={`font-medium transition-all py-6 whitespace-nowrap border-b-2 flex items-center ${
-                  pathname === link.href || pathname.startsWith(link.href + '/') ? 'border-accent text-accent' : 'border-transparent text-gray-200 hover:text-accent hover:border-accent/40'
+                  pathname === link.href || pathname.startsWith(link.href + '/') ? 'border-accent text-accent' : 'border-transparent text-slate-600 hover:text-accent hover:border-accent/40'
                 }`}
               >
                 {link.label}
@@ -166,21 +166,21 @@ export default function Header() {
           {isLoaded && user ? (
             <div className="flex items-center gap-4">
               <Link href="/mypage" className="text-sm flex items-center hover:opacity-80 transition-opacity">
-                <span className="text-gray-200 mr-2 font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
-                <span className="bg-white/10 text-accent px-2 py-1 rounded text-xs border border-white/10">
+                <span className="text-slate-700 mr-2 font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
+                <span className="bg-slate-200/50 text-accent px-2 py-1 rounded text-xs border border-slate-300">
                   {getLevelName(user.level)}
                 </span>
               </Link>
               <button 
                 onClick={logout}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
               >
                 로그아웃
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+              <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
                 로그인
               </Link>
               <Link href="/signup" className="text-sm font-bold bg-accent text-white px-4 py-2 rounded-md shadow hover:bg-accent-hover hover:-translate-y-0.5 transition-all">
@@ -193,7 +193,7 @@ export default function Header() {
         {/* Mobile Menu Toggle Button */}
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden p-2 text-white hover:text-accent transition-colors focus:outline-none z-50 flex items-center justify-center bg-white/5 rounded-md border border-white/10"
+          className="md:hidden p-2 text-slate-700 hover:text-accent transition-colors focus:outline-none z-50 flex items-center justify-center bg-slate-100 rounded-md border border-slate-200"
           aria-label={isMobileMenuOpen ? "닫기" : "메뉴 열기"}
         >
           {isMobileMenuOpen ? (
