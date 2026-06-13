@@ -116,7 +116,7 @@ export default function Header() {
           <div className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden relative">
             <Image 
               src="/logo.png" 
-              alt="사단법인 직장인밴드연합회 로고" 
+              alt="사단법인 아마추어 악기 동호회 연합 로고" 
               fill
               className="object-contain"
             />
@@ -124,7 +124,7 @@ export default function Header() {
           <div className="flex flex-col justify-center">
             <span className="text-[10px] md:text-xs text-accent font-semibold tracking-wider">사단법인</span>
             <span className="text-lg md:text-xl font-bold tracking-tight group-hover:text-gray-200 transition-colors">
-              직장인밴드연합회
+              아마추어 악기 동호회 연합
             </span>
           </div>
         </Link>
@@ -142,13 +142,13 @@ export default function Header() {
                 {link.label}
               </Link>
               {link.subItems && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-52 bg-[#0A103D] shadow-2xl rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border-t-2 border-accent border border-white/10 overflow-hidden pointer-events-none group-hover:pointer-events-auto">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-52 bg-primary-dark shadow-2xl rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border-t-2 border-accent border border-white/10 overflow-hidden pointer-events-none group-hover:pointer-events-auto">
                   <div className="p-3 flex flex-col gap-1">
                     {link.subItems.map(subItem => (
                       <Link 
                         key={subItem.label} 
                         href={subItem.href}
-                        className="text-gray-300 hover:text-[#0A103D] text-sm py-3 px-4 hover:bg-accent rounded transition-colors flex items-center gap-3 font-medium whitespace-nowrap"
+                        className="text-gray-300 hover:text-white text-sm py-3 px-4 hover:bg-accent rounded transition-colors flex items-center gap-3 font-medium whitespace-nowrap"
                       >
                         {!!subItem.icon && <span className="text-lg">{subItem.icon}</span>}
                         {subItem.label}
@@ -183,7 +183,7 @@ export default function Header() {
               <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
                 로그인
               </Link>
-              <Link href="/signup" className="text-sm font-bold bg-accent text-[#0A103D] px-4 py-2 rounded-md shadow hover:bg-[#82C8FF] hover:-translate-y-0.5 transition-all">
+              <Link href="/signup" className="text-sm font-bold bg-accent text-white px-4 py-2 rounded-md shadow hover:bg-accent-hover hover:-translate-y-0.5 transition-all">
                 회원가입
               </Link>
             </div>
@@ -210,11 +210,11 @@ export default function Header() {
 
       {/* Mobile Menu Overlay / Sliding Drawer */}
       <div 
-        className={`md:hidden absolute top-[80px] md:top-[112px] left-0 w-full h-[calc(100vh-80px)] overflow-y-auto bg-[#0A103D]/95 backdrop-blur-xl border-t border-white/10 transition-all duration-300 ease-in-out origin-top ${
+        className={`md:hidden absolute top-[80px] md:top-[112px] left-0 w-full h-[calc(100vh-80px)] overflow-y-auto bg-primary-dark/95 backdrop-blur-xl border-t border-white/10 transition-all duration-300 ease-in-out origin-top ${
           isMobileMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'
         }`}
       >
-        <div className="flex flex-col px-6 py-6 pb-24 gap-3 bg-gradient-to-b from-transparent to-[#111827]/80 min-h-full">
+        <div className="flex flex-col px-6 py-6 pb-24 gap-3 bg-gradient-to-b from-transparent to-primary-dark/80 min-h-full">
           <div className="text-xs font-bold text-accent tracking-widest mb-2 px-1">MENU</div>
           
           {navLinks.map((link) => (
@@ -224,13 +224,13 @@ export default function Header() {
                 onClick={() => !link.subItems && setIsMobileMenuOpen(false)}
                 className={`text-lg font-bold px-5 py-4 rounded-xl flex items-center justify-between transition-all ${
                   pathname === link.href || pathname.startsWith(link.href + '/')
-                    ? 'bg-accent text-[#0A103D] shadow-lg translate-x-2' 
+                    ? 'bg-accent text-white shadow-lg translate-x-2' 
                     : 'bg-white/5 text-gray-300 border border-white/5 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {link.label}
                 <div className="flex gap-2 items-center">
-                  <svg className={`w-5 h-5 ${pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-[#0A103D]' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-5 h-5 ${pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-white' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -258,7 +258,7 @@ export default function Header() {
               <>
                 <Link href="/mypage" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-2 mb-2 py-2 hover:bg-white/5 rounded-lg transition-colors">
                   <span className="text-white font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
-                  <span className="bg-accent text-[#0A103D] px-2 py-0.5 rounded text-xs font-bold">
+                  <span className="bg-accent text-white px-2 py-0.5 rounded text-xs font-bold">
                     {getLevelName(user.level)}
                   </span>
                 </Link>
@@ -281,7 +281,7 @@ export default function Header() {
                 <Link 
                   href="/signup"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center text-base font-bold bg-accent text-[#0A103D] py-4 rounded-xl shadow-lg hover:bg-[#82C8FF] transition-colors"
+                  className="w-full flex items-center justify-center text-base font-bold bg-accent text-white py-4 rounded-xl shadow-lg hover:bg-accent-hover transition-colors"
                 >
                   회원가입
                 </Link>

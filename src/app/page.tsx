@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import Calendar from '@/components/Calendar';
+import BranchMap from '@/components/BranchMap';
 
 export const dynamic = 'force-dynamic';
 
@@ -234,25 +235,16 @@ export default async function Home() {
           <span className="text-[#E89C5E] text-xs font-bold tracking-widest uppercase mb-2 block">Our Warm Community</span>
           <h2 className="text-2xl md:text-3xl font-black text-[#3E332E] mb-3">전국 방방곡곡 지부 네트워크</h2>
           <p className="text-neutral-500 text-sm md:text-base mb-10 max-w-xl mx-auto leading-relaxed text-pretty">
-            우리 동네 음악 놀이터가 전국의 끈끈한 네트워크로 이어집니다. 가까운 지부에서 따뜻한 음악 동료를 만나보세요.
+            우리 동네 음악 놀이터가 전국의 끈끈한 네트워크로 이어집니다. 아래 지도 노드를 눌러 지부별 모임방 현황과 실시간 이웃 소식을 만나보세요.
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { region: '서울/수도권 지부', count: finalSeoul, color: 'border-[#E89C5E]', desc: '소담한 골목길 버스킹과 정모' },
-              { region: '충청/강원 지부', count: finalChungcheong, color: 'border-[#4A5D4E]', desc: '자연 속 힐링 연주와 통기타 캠핑' },
-              { region: '영남 지부', count: finalYeongnam, color: 'border-[#7A5A44]', desc: '파도 소리와 함께하는 해변 낭만 버스킹' },
-              { region: '호남/제주 지부', count: finalHonam, color: 'border-[#D2B48C]', desc: '돌담 너머 들려오는 따뜻한 선율' },
-            ].map((item, idx) => (
-              <div key={idx} className={`bg-white p-7 rounded-2xl border-t-4 ${item.color} shadow-xs hover:-translate-y-1 hover:shadow-md transition-all duration-300 text-left`}>
-                <div className="text-[#3E332E] font-bold text-base mb-1">{item.region}</div>
-                <div className="text-xs text-neutral-500 mb-4 h-8 text-pretty">{item.desc}</div>
-                <div className="text-4xl font-black text-[#7A5A44] flex items-end gap-1">
-                  <span>{item.count}</span>
-                  <span className="text-sm font-normal text-neutral-400 mb-1">개 모임방</span>
-                </div>
-              </div>
-            ))}
+          <div className="max-w-5xl mx-auto">
+            <BranchMap 
+              seoulCount={finalSeoul} 
+              chungcheongCount={finalChungcheong} 
+              yeongnamCount={finalYeongnam} 
+              honamCount={finalHonam} 
+            />
           </div>
           
           <div className="mt-10">

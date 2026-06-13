@@ -7,8 +7,8 @@ import Header from "@/components/Header";
 import { AuthProvider } from "@/lib/useAuth";
 
 export const metadata: Metadata = {
-  title: "사단법인 직장인밴드연합회 - SoundBridge",
-  description: "직장인밴드 동호회를 위한 커뮤니티 공간 및 게시판",
+  title: "사단법인 아마추어 악기 동호회 연합 - 문화클럽24",
+  description: "전국 아마추어 악기 연주자들의 따뜻하고 친근한 음악 놀이터",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -32,25 +32,25 @@ export default function RootLayout({
             {children}
         </main>
 
-        <footer className="bg-[#111827] text-gray-400 py-12 mt-auto border-t border-gray-800">
+        <footer className="bg-[#2D231E] text-gray-300 py-12 mt-auto border-t border-[#4A3B32]/30">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div className="flex flex-col gap-2">
               <div className="text-lg font-bold text-white mb-2 flex items-center gap-3">
-                 <div className="w-12 h-12 flex items-center justify-center overflow-hidden relative">
-                   <Image 
-                     src="/logo.png" 
-                     alt="로고" 
-                     fill
-                     className="object-contain"
-                   />
-                 </div>
-                 사단법인 직장인밴드연합회
+                <div className="w-12 h-12 flex items-center justify-center overflow-hidden relative">
+                  <Image 
+                    src="/logo.png" 
+                    alt="로고" 
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                사단법인 아마추어 악기 동호회 연합
               </div>
-              <p className="text-sm text-gray-400">법인명: 사단법인직장인밴드연합회 | 대표자: 도욱상 | 고유번호: 미정</p>
+              <p className="text-sm text-gray-400">법인명: 사단법인 아마추어 악기 동호회 연합 | 대표자: 도욱상 | 고유번호: 미정</p>
               <p className="text-sm text-gray-400">주소: 서초구 효령로4길 566-16</p>
               <p className="text-sm text-gray-400">이메일: dowooksang@gmail.com</p>
               <div className="text-xs text-gray-500 mt-4">
-                © {new Date().getFullYear()} 직장인밴드연합회. All rights reserved.
+                © {new Date().getFullYear()} 아마추어 악기 동호회 연합. All rights reserved.
               </div>
             </div>
             
