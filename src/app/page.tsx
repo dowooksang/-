@@ -140,7 +140,7 @@ export default async function Home() {
             </h2>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#3E332E] tracking-tight mb-6 leading-tight text-balance">
               초보부터 베테랑까지,<br />
-              <span className="text-[#E89C5E] underline decoration-4 decoration-[#E89C5E]/40 underline-offset-8">함께 만드는</span> 우리들의 음악 이야기
+              <span className="text-[#E89C5E] underline decoration-4 decoration-[#E89C5E]/40 underline-offset-8">함께 만드는</span> 우리동네 문화클럽
             </h1>
             <p className="text-base md:text-lg text-[#5A4535] font-normal mb-8 leading-relaxed max-w-xl text-pretty">
               사단법인직장인밴드연합회가 전국의 모든 일상 속 연주자들을 위해 따뜻하고 친근한 쉼터가 되어 드립니다. 
