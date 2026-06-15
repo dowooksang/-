@@ -7,14 +7,31 @@ import Header from "@/components/Header";
 import { AuthProvider } from "@/lib/useAuth";
 
 export const metadata: Metadata = {
-  title: "사단법인직장인밴드연합회 - 문화클럽24",
-  description: "전국 아마추어 악기 연주자들의 따뜻하고 친근한 음악 놀이터",
+  title: "우리동네문화클럽- 직장인밴드연합회",
+  description: "초보부터 베테랑까지 함께하는 우리 동네 음악 놀이터",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
+  openGraph: {
+    title: "우리동네문화클럽- 직장인밴드연합회",
+    description: "초보부터 베테랑까지 함께하는 우리 동네 음악 놀이터",
+    url: "https://cultureclub24.com",
+    siteName: "우리동네문화클럽- 직장인밴드연합회",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 600,
+        alt: "우리동네문화클럽 로고",
+      },
+    ],
+    locale: "ko_KR",
+    type: "website",
+  },
 };
+
 
 export default function RootLayout({
   children,
