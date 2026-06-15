@@ -31,8 +31,8 @@ export default function MyPage() {
       })
     : '가입일 정보 없음';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/');
   };
 

@@ -228,11 +228,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      // 1. 백엔드 API를 호출하여 httpOnly 세션 쿠키들을 서버 사이드에서 강제 파기 (리다이렉트 취소 방지)
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('로그아웃 API 호출 실패:', e);
+    }
+
+    try {
+      // 2. Supabase 공식 signOut 호출하여 SDK 내부 상태 파기
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Supabase signOut 에러:', e);
+    }
+
+    // 3. 로컬 상태 및 로컬 스토리지 데이터 정리
     setUser(null);
     localStorage.removeItem('jb_session_email');
-    // Remove the plain email cookie we set on login
-    document.cookie = 'email=; Max-Age=0; path=/; domain=' + location.hostname;
+
+    // 4. 클라이언트 단에서도 만약을 대비해 쿠키 정리 시도 (다양한 도메인 스코프 고려)
+    try {
+      const domains = [location.hostname, '', `.${location.hostname.split('.').slice(-2).join('.')}`];
+      domains.forEach(domain => {
+        const domainStr = domain ? `; domain=${domain}` : '';
+        document.cookie = `email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/${domainStr}`;
+        document.cookie = `sb-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/${domainStr}`;
+        document.cookie = `sb-refresh-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/${domainStr}`;
+      });
+    } catch (cookieErr) {
+      console.error('클라이언트 쿠키 수동 삭제 실패:', cookieErr);
+    }
   };
 
   return (
