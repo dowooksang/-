@@ -55,6 +55,27 @@ export default function AdminBranchesPage() {
     }
   };
 
+  const handleCancelApproval = async (branchId: string) => {
+    if (!confirm('해당 지부의 승인을 취소하시겠습니까?\n지부장 권한도 정회원으로 강등됩니다.')) return;
+    
+    try {
+      const res = await fetch('/api/admin/branches/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ branchId })
+      });
+      
+      if (res.ok) {
+        alert('지부 승인이 취소되었습니다.');
+        fetchBranches();
+      } else {
+        alert('승인 취소 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
   if (!isLoaded || isLoading) return <div className="text-center py-20 text-white">로딩 중...</div>;
 
   const pendingBranches = branches.filter(b => b.status === 'pending');
@@ -137,6 +158,7 @@ export default function AdminBranchesPage() {
                 <th className="p-4 font-bold text-accent">활동 지역</th>
                 <th className="p-4 font-bold text-accent text-center">동호회 수</th>
                 <th className="p-4 font-bold text-accent text-center">모임 공간</th>
+                <th className="p-4 font-bold text-accent text-center">관리</th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +171,14 @@ export default function AdminBranchesPage() {
                   <td className="p-4 text-center font-semibold text-gray-100">{b.bandCount}팀</td>
                   <td className="p-4 text-center font-bold text-white">
                     {b.hasPracticeRoom ? <span className="text-green-300">O (보유)</span> : <span className="text-gray-400">X (미보유)</span>}
+                  </td>
+                  <td className="p-4 text-center">
+                    <button
+                      onClick={() => handleCancelApproval(b.id)}
+                      className="bg-red-600/80 border border-red-500/30 text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-red-700 transition-colors shadow"
+                    >
+                      승인 취소
+                    </button>
                   </td>
                 </tr>
               ))}

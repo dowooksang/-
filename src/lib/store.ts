@@ -98,13 +98,15 @@ export const db = {
   },
 
   async getBranches() {
-    const { data, error } = await supabase.from('branches').select('*');
+    const { data, error } = await supabase
+      .from('branches')
+      .select('*, users(name, phone)');
     if (error) throw error;
     return data.map((b: any) => ({
       id: b.id,
       name: b.name,
-      managerName: b.manager_name,
-      managerPhone: b.manager_phone,
+      managerName: b.users?.name || b.manager_name || '정보 없음',
+      managerPhone: b.users?.phone || b.manager_phone || '정보 없음',
       region: b.region,
       hasPracticeRoom: b.has_practice,
       bandCount: b.band_count,
@@ -142,6 +144,28 @@ export const db = {
     const { error: updateUserErr } = await supabase
       .from('users')
       .update({ level: UserLevel.LV4_MANAGER })
+      .eq('id', branch.user_id);
+    
+    return !updateUserErr;
+  },
+
+  async cancelBranchApproval(branchId: string): Promise<boolean> {
+    const { data: branch, error: getErr } = await supabase
+      .from('branches')
+      .select('user_id')
+      .eq('id', branchId)
+      .single();
+    if (getErr || !branch) return false;
+
+    const { error: updateBranchErr } = await supabase
+      .from('branches')
+      .update({ status: 'pending' })
+      .eq('id', branchId);
+    if (updateBranchErr) return false;
+
+    const { error: updateUserErr } = await supabase
+      .from('users')
+      .update({ level: UserLevel.LV2_MEMBER })
       .eq('id', branch.user_id);
     
     return !updateUserErr;

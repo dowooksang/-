@@ -14,6 +14,8 @@ export default function SignupPage() {
     email: '',
     password: '',
     phone: '',
+    address: '',
+    position: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -44,6 +46,9 @@ export default function SignupPage() {
         email: form.email,
         nickname: form.name, // 닉네임 필수값에 이름을 기본값으로 매핑
         phone: form.phone,
+        address: form.address,
+        position: form.position,
+        band_name: '소속 없음',
         status: 'pending',   // 승인 대기(pending) 상태로 가입
         level: 1,            // 준회원(LV1_GUEST = 1) 등급 부여
         created_at: new Date().toISOString(),
@@ -96,9 +101,28 @@ export default function SignupPage() {
         <input
           type="text"
           name="phone"
-          placeholder="연락처"
+          placeholder="연락처 (예: 010-1234-5678)"
           value={form.phone}
           onChange={handleChange}
+          required
+          className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="활동 지역 (예: 서울시 서초구)"
+          value={form.address}
+          onChange={handleChange}
+          required
+          className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <input
+          type="text"
+          name="position"
+          placeholder="포지션/악기 파트 (예: 보컬, 기타, 베이스, 드럼 등)"
+          value={form.position}
+          onChange={handleChange}
+          required
           className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <button
