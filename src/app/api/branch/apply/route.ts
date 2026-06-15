@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      const newBranch = db.addBranch({
+      const newBranch = await db.addBranch({
         name,
         managerName,
         managerPhone,

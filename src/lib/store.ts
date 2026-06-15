@@ -66,15 +66,52 @@ export const db = {
     bandCount: number;
     userId: string;
   }) {
-    const { data, error } = await supabase.from('branches').insert(branch).single();
+    const { data, error } = await supabase
+      .from('branches')
+      .insert({
+        name: branch.name,
+        manager_name: branch.managerName,
+        manager_phone: branch.managerPhone,
+        region: branch.region,
+        has_practice: branch.hasPracticeRoom,
+        band_count: branch.bandCount,
+        user_id: branch.userId,
+        status: 'pending'
+      })
+      .select()
+      .single();
+    
     if (error) throw error;
-    return data;
+    
+    return {
+      id: data.id,
+      name: data.name,
+      managerName: data.manager_name,
+      managerPhone: data.manager_phone,
+      region: data.region,
+      hasPracticeRoom: data.has_practice,
+      bandCount: data.band_count,
+      status: data.status,
+      userId: data.user_id,
+      createdAt: data.created_at
+    };
   },
 
   async getBranches() {
     const { data, error } = await supabase.from('branches').select('*');
     if (error) throw error;
-    return data;
+    return data.map((b: any) => ({
+      id: b.id,
+      name: b.name,
+      managerName: b.manager_name,
+      managerPhone: b.manager_phone,
+      region: b.region,
+      hasPracticeRoom: b.has_practice,
+      bandCount: b.band_count,
+      status: b.status,
+      userId: b.user_id,
+      createdAt: b.created_at
+    }));
   },
 
   // ---------- Admin utilities (generic) ----------
@@ -91,7 +128,7 @@ export const db = {
   async approveBranch(branchId: string): Promise<boolean> {
     const { data: branch, error: getErr } = await supabase
       .from('branches')
-      .select('userId')
+      .select('user_id')
       .eq('id', branchId)
       .single();
     if (getErr || !branch) return false;
@@ -105,7 +142,7 @@ export const db = {
     const { error: updateUserErr } = await supabase
       .from('users')
       .update({ level: UserLevel.LV4_MANAGER })
-      .eq('id', branch.userId);
+      .eq('id', branch.user_id);
     
     return !updateUserErr;
   },
