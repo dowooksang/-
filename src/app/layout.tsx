@@ -63,7 +63,7 @@ export default function RootLayout({
                 </div>
                 사단법인직장인밴드연합회
               </div>
-              <p className="text-sm text-slate-500">법인명: 사단법인직장인밴드연합회 | 대표자: 도욱상 | 등록번호: 110221-0016189</p>
+              <p className="text-sm text-slate-500">법인명: 사단법인직장인밴드연합회 | L E T's | CEO & Founder | 등록번호: 110221-0016189</p>
               <p className="text-sm text-slate-500">주소: 효령로4길 56-16</p>
               <p className="text-sm text-slate-500">이메일: dowooksang@gmail.com</p>
               <div className="text-xs text-slate-400 mt-4">
