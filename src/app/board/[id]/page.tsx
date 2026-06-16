@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import DeleteButton from './DeleteButton';
 import { cookies } from 'next/headers';
 import { Lock } from 'lucide-react';
+import CommentSection from '@/components/CommentSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,18 +65,20 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   // 1. 로그인 상태 및 현재 사용자 등급 파악
   const userLevel = await getCurrentUserLevel();
 
-  // 2. 해당 카테고리의 필요 읽기 등급 조회
+  // 2. 해당 카테고리의 필요 읽기/쓰기 등급 조회
   const category = post.category || 'free';
   let readLevel = DEFAULT_READ_LEVELS[category] ?? 1;
+  let writeLevel = 2; // 기본 fallback
   try {
     const { data: permData } = await supabase
       .from('board_permissions')
-      .select('read_level')
+      .select('read_level, write_level')
       .eq('category', category)
       .single();
     
     if (permData) {
       readLevel = permData.read_level;
+      writeLevel = permData.write_level;
     }
   } catch (e) {
     console.warn('board_permissions 조회 에러 (기본값 적용):', e);
@@ -154,6 +157,13 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </div>
+
+          {/* 준회원(LV1, LV2) 이상 글 작성 가능 게시판에만 댓글 기능 추가 */}
+          {writeLevel <= 2 && (
+            <div className="px-6 pb-8 border-t border-gray-100">
+              <CommentSection postId={post.id} />
+            </div>
+          )}
 
           <footer className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
             <Link

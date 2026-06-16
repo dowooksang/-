@@ -105,8 +105,8 @@ export const db = {
     return data.map((b: any) => ({
       id: b.id,
       name: b.name,
-      managerName: b.users?.name || b.manager_name || '정보 없음',
-      managerPhone: b.users?.phone || b.manager_phone || '정보 없음',
+      managerName: b.manager_name || b.users?.name || '정보 없음',
+      managerPhone: b.manager_phone || b.users?.phone || '정보 없음',
       region: b.region,
       hasPracticeRoom: b.has_practice,
       bandCount: b.band_count,

@@ -36,11 +36,23 @@ export default function SignupPage() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
+        options: {
+          data: {
+            nickname: form.name,
+            name: form.name,
+            phone: form.phone,
+            address: form.address,
+            position: form.position,
+            band_name: '소속 없음',
+            status: 'pending',
+            level: 1,
+          }
+        }
       });
       if (authError) throw authError;
       if (!authData?.user) throw new Error('회원가입 처리 중 사용자 정보를 생성하지 못했습니다.');
 
-      const { error: dbError } = await supabase.from('users').insert({
+      const { error: dbError } = await supabase.from('users').upsert({
         id: authData.user.id,
         name: form.name,
         email: form.email,
@@ -52,7 +64,7 @@ export default function SignupPage() {
         status: 'pending',   // 승인 대기(pending) 상태로 가입
         level: 1,            // 준회원(LV1_GUEST = 1) 등급 부여
         created_at: new Date().toISOString(),
-      });
+      }, { onConflict: 'id' });
       if (dbError) throw dbError;
 
       setSuccess('회원가입이 완료되었습니다! 로그인해 주세요.');
