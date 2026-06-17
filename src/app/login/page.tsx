@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
 
 export default function LoginPage() {
+  const router = useRouter();
   const { login, logout } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -20,8 +22,9 @@ export default function LoginPage() {
       // useAuth의 login 함수가 내부적으로 supabase.auth.signInWithPassword를 호출합니다.
       await login(formData.email, formData.password);
       
-      // 로그인 성공 → 관리자 대시보드 강제 이동
-      window.location.href = '/admin/dashboard';
+      // 로그인 성공 → 즉시 세션 반영을 위한 refresh 후 메인으로 실시간 이동
+      router.refresh();
+      router.push('/');
     } catch (err: any) {
       console.error('Login error:', err);
       // 로그인 실패 시 세션 완전 파괴

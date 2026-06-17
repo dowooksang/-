@@ -187,8 +187,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           createdAt: dbUser ? dbUser.created_at : session.user.created_at,
           position: dbUser ? dbUser.position : session.user.user_metadata?.position,
         });
+
+        // 클라이언트 세션 변경 시 쿠키 실시간 동기화
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=604800; sameSite=lax`;
+        document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=2592000; sameSite=lax`;
+        document.cookie = `email=${encodeURIComponent(email)}; path=/; max-age=604800; sameSite=lax`;
       } else {
         setUser(null);
+        // 세션 해제 시 쿠키 파기
+        document.cookie = `email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/`;
+        document.cookie = `sb-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/`;
+        document.cookie = `sb-refresh-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; Max-Age=0; path=/`;
       }
     });
     return () => subscription.unsubscribe();

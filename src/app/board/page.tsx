@@ -17,6 +17,7 @@ const CATEGORY_NAMES: Record<string, { title: string, desc: string }> = {
   qa: { title: '건의 및 Q&A', desc: '연합회에 궁금한 점이나 건의사항을 남겨주세요.' },
   press: { title: '보도자료', desc: '사단법인의 공식 보도자료입니다.' },
   event: { title: '이벤트', desc: '진행 중인 이벤트 소식입니다.' },
+  council: { title: '지부장 회의실', desc: '지부장 및 관리자 전용 회의 공간입니다.' }
 };
 
 const DEFAULT_READ_LEVELS: Record<string, number> = {
@@ -28,7 +29,8 @@ const DEFAULT_READ_LEVELS: Record<string, number> = {
   archive: 2,
   qa: 1,
   press: 1,
-  event: 1
+  event: 1,
+  council: 4
 };
 
 const LEVEL_NAMES: Record<number, string> = {
@@ -122,11 +124,16 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
   let query = supabase
     .from('posts')
     .select('*')
+    .order('is_notice', { ascending: false })
     .order('created_at', { ascending: false });
 
-  // Only filter by category if it exists in the URL, otherwise show all or just 'free'
-  // Typically, we want to filter by the specific category.
-  query = query.eq('category', currentCategory);
+  // 카테고리가 'council'인 경우 board_type = 'council'인 것만 필터링
+  if (currentCategory === 'council') {
+    query = query.eq('board_type', 'council');
+  } else {
+    // 일반 게시판은 board_type = 'general' 이고 category = currentCategory 인 것을 조회
+    query = query.eq('category', currentCategory).eq('board_type', 'general');
+  }
 
   const { data: posts } = await query;
   const postList = posts || [];
@@ -155,14 +162,30 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                 등록된 게시물이 없습니다.
               </li>
             ) : (
-              postList.map(post => (
-                <li key={post.id} className="hover:bg-gray-55 transition-colors">
-                  <Link href={`/board/${post.id}`} className="block px-6 py-5">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <h2 className="text-lg font-medium text-[#333333] mb-1 truncate">
-                          {post.title}
-                        </h2>
+              postList.map(post => {
+                const isNotice = post.is_notice === true;
+                return (
+                  <li 
+                    key={post.id} 
+                    className={`transition-colors duration-150 ${
+                      isNotice 
+                        ? 'bg-[#F4F7FB] hover:bg-[#ECF1F7] border-l-4 border-l-[#5486B2]' 
+                        : 'hover:bg-gray-55'
+                    }`}
+                  >
+                    <Link href={`/board/${post.id}`} className="block px-6 py-5">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            {isNotice && (
+                              <span className="bg-[#5486B2] text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow-sm">
+                                [공지]
+                              </span>
+                            )}
+                            <h2 className={`text-lg text-[#333333] truncate ${isNotice ? 'font-bold' : 'font-medium'}`}>
+                              {post.title}
+                            </h2>
+                          </div>
                         <div className="flex items-center gap-3 text-sm text-gray-500">
                           <span className="font-medium text-gray-700">{post.author}</span>
                           <span className="text-gray-300">|</span>
@@ -176,8 +199,9 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                     </div>
                   </Link>
                 </li>
-              ))
-            )}
+              );
+            })
+          )}
           </ul>
         </div>
       </div>

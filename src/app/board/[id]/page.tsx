@@ -158,8 +158,8 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
             />
           </div>
 
-          {/* 준회원(LV1, LV2) 이상 글 작성 가능 게시판에만 댓글 기능 추가 */}
-          {writeLevel <= 2 && (
+          {/* 쓰기 등급이 현재 로그인 사용자 등급 이하인 경우에 댓글 작성 기능 제공 */}
+          {userLevel >= writeLevel && (
             <div className="px-6 pb-8 border-t border-gray-100">
               <CommentSection postId={post.id} />
             </div>

@@ -13,6 +13,7 @@ interface BoardFormProps {
     title: string;
     content: string;
     author: string;
+    is_notice?: boolean;
   };
   isEdit?: boolean;
   category?: string;
@@ -26,6 +27,7 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
     title: initialData?.title || '',
     content: initialData?.content || ''
   });
+  const [isNotice, setIsNotice] = useState(initialData?.is_notice || false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +100,8 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
           .update({
             title: formData.title,
             content: formData.content,
+            is_notice: isNotice,
+            board_type: category === 'council' ? 'council' : 'general'
           })
           .eq('id', initialData?.id);
         
@@ -111,7 +115,9 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
             content: formData.content,
             author: user.nickname || '익명',
             author_id: user.id, // RLS 정책 및 작성자 데이터 매핑을 위해 author_id 추가
-            category: category
+            category: category,
+            is_notice: isNotice,
+            board_type: category === 'council' ? 'council' : 'general'
           }])
           .select()
           .single();
@@ -142,6 +148,21 @@ export default function BoardForm({ initialData, isEdit = false, category = 'fre
             placeholder="제목을 입력하세요"
           />
         </div>
+
+        {user && user.level !== undefined && user.level >= 4 && (
+          <div className="flex items-center gap-4 border-t border-gray-100 pt-6">
+            <span className="min-w-[100px] font-medium text-[#333333]">공지 여부</span>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isNotice}
+                onChange={e => setIsNotice(e.target.checked)}
+                className="w-4.5 h-4.5 text-[#5486B2] border-gray-300 rounded focus:ring-[#5486B2]"
+              />
+              <span className="text-sm font-semibold text-gray-700">이 게시판의 공지로 등록</span>
+            </label>
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row md:items-center gap-4 border-t border-gray-100 pt-6">
           <label htmlFor="author" className="min-w-[100px] font-medium text-[#333333]">작성자</label>
