@@ -36,7 +36,7 @@ export default function Header() {
       href: '/solo', 
       label: '방구석 아티스트',
       subItems: [
-        { href: '/solo/jam', label: '방구석 릴레이 잼', icon: '🎸' },
+        { href: '/solo/jam', label: '방구석에선 내가 왕 ㅋㅋ', icon: '🎸' },
         { href: '/solo/group', label: '소모임 및 매칭', icon: '🤝' },
         { href: '/solo/lesson', label: '레슨 및 장비리뷰', icon: '📖' },
         { href: '/solo/debut', label: '무대 데뷔 신청', icon: '🎤' }

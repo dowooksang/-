@@ -287,8 +287,8 @@ export default async function Home() {
                 거창한 밴드나 무대가 아니어도 괜찮습니다. 소박한 다락방에서 혼자 튕기는 통기타의 멜로디, 
                 나만의 일상적인 음악 이야기를 편안하게 이웃들과 나누어 보세요.
               </p>
-              <Link href="/solo" className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-[#E89C5E] hover:bg-[#D98B4D] text-white font-bold rounded-xl shadow transition-colors text-sm duration-300">
-                방구석 릴레이 잼 참여하기 🎸
+              <Link href="/solo/jam" className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-[#E89C5E] hover:bg-[#D98B4D] text-white font-bold rounded-xl shadow transition-colors text-sm duration-300">
+                방구석에선 내가 왕 ㅋㅋ 참여하기 🎸
               </Link>
             </div>
             
@@ -318,7 +318,7 @@ export default async function Home() {
             <h3 className="text-2xl font-black text-[#3E332E] mb-3">"소박한 통기타로 전하는 따뜻한 위로" - 김영희 님</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-6 text-pretty">
               "퇴근 후 혼자 방 안에서 튕기던 통기타가 이제는 동네 이웃들과 따뜻한 인사를 나누는 작은 다리가 되었습니다. 
-              부족한 솜씨인데도 '방구석 릴레이 잼' 게시판에서 이웃분들이 건네주신 다정한 격려글 덕분에 큰 용기를 얻었고, 
+              부족한 솜씨인데도 '방구석에선 내가 왕 ㅋㅋ' 게시판에서 이웃분들이 건네주신 다정한 격려글 덕분에 큰 용기를 얻었고, 
               이번에 우리 지부 주말 음악회 오프닝 무대에도 서게 되었습니다. 음악은 일상의 가장 포근한 위로예요."
             </p>
             <div>

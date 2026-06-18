@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { createServerSupabase } from '@/lib/supabaseServer';
 import DeleteButton from './DeleteButton';
 import { cookies } from 'next/headers';
 import { Lock } from 'lucide-react';
@@ -36,7 +37,8 @@ async function getCurrentUserLevel() {
   if (!emailCookie) return 0; // 로그인하지 않은 경우 (손님 레벨 0)
 
   try {
-    const { data: user, error } = await supabase
+    const supabaseServer = await createServerSupabase();
+    const { data: user, error } = await supabaseServer
       .from('users')
       .select('level')
       .eq('email', decodeURIComponent(emailCookie))
@@ -51,8 +53,9 @@ async function getCurrentUserLevel() {
 
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
+  const supabaseServer = await createServerSupabase();
   
-  const { data: post } = await supabase
+  const { data: post } = await supabaseServer
     .from('posts')
     .select('*')
     .eq('id', resolvedParams.id)
@@ -70,7 +73,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   let readLevel = DEFAULT_READ_LEVELS[category] ?? 1;
   let writeLevel = 2; // 기본 fallback
   try {
-    const { data: permData } = await supabase
+    const { data: permData } = await supabaseServer
       .from('board_permissions')
       .select('read_level, write_level')
       .eq('category', category)
@@ -84,9 +87,12 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
     console.warn('board_permissions 조회 에러 (기본값 적용):', e);
   }
 
-  // 3. 권한 대조 및 차단 뷰 반환
-  if (userLevel < readLevel) {
-    const targetLevelName = LEVEL_NAMES[readLevel] || `LV${readLevel}`;
+  // 3. 권한 대조 및 차단 뷰 반환 (지부장 회의실 게시물인 경우 Level 4 이상 강제)
+  const isCouncilPost = post.board_type === 'council';
+  const effectiveReadLevel = isCouncilPost ? Math.max(readLevel, 4) : readLevel;
+
+  if (userLevel < effectiveReadLevel) {
+    const targetLevelName = LEVEL_NAMES[effectiveReadLevel] || `LV${effectiveReadLevel}`;
     const myLevelName = userLevel === 0 ? '비회원 (로그인 필요)' : LEVEL_NAMES[userLevel] || `LV${userLevel}`;
 
     return (
@@ -121,7 +127,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
 
   // 조회수 1 증가 처리
   const currentViews = (post.views || 0) + 1;
-  await supabase
+  await supabaseServer
     .from('posts')
     .update({ views: currentViews })
     .eq('id', resolvedParams.id);

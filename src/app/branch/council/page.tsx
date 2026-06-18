@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
+import { createServerSupabase } from '@/lib/supabaseServer';
 import { PenSquare, Lock, MessageSquare, ShieldAlert } from 'lucide-react';
 import { cookies } from 'next/headers';
 
@@ -23,7 +24,8 @@ async function getCurrentUserLevel() {
   if (!emailCookie) return 0; // 로그인하지 않은 경우 (손님 레벨 0)
 
   try {
-    const { data: user, error } = await supabase
+    const supabaseServer = await createServerSupabase();
+    const { data: user, error } = await supabaseServer
       .from('users')
       .select('level, nickname, name')
       .eq('email', decodeURIComponent(emailCookie))
@@ -43,7 +45,8 @@ async function getCurrentUser() {
   if (!emailCookie) return null;
 
   try {
-    const { data: user } = await supabase
+    const supabaseServer = await createServerSupabase();
+    const { data: user } = await supabaseServer
       .from('users')
       .select('id, email, nickname, name, level')
       .eq('email', decodeURIComponent(emailCookie))
@@ -91,7 +94,8 @@ export default async function BranchCouncilPage() {
   }
 
   // 지부장 회의실 게시물 조회 (공지사항 고정 -> 최신순 정렬)
-  const { data: posts, error } = await supabase
+  const supabaseServer = await createServerSupabase();
+  const { data: posts, error } = await supabaseServer
     .from('posts')
     .select('*')
     .eq('board_type', 'council')

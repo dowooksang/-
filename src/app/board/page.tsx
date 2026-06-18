@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
+import { createServerSupabase } from '@/lib/supabaseServer';
 import { PenSquare, Lock } from 'lucide-react';
 import { cookies } from 'next/headers';
 
@@ -49,7 +50,8 @@ async function getCurrentUserLevel() {
   if (!emailCookie) return 0; // 로그인하지 않은 경우 (손님 레벨 0)
 
   try {
-    const { data: user, error } = await supabase
+    const supabaseServer = await createServerSupabase();
+    const { data: user, error } = await supabaseServer
       .from('users')
       .select('level')
       .eq('email', decodeURIComponent(emailCookie))
@@ -72,8 +74,9 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
 
   // 2. 해당 카테고리의 필요 읽기 등급 조회
   let readLevel = DEFAULT_READ_LEVELS[currentCategory] ?? 1;
+  const supabaseServer = await createServerSupabase();
   try {
-    const { data: permData } = await supabase
+    const { data: permData } = await supabaseServer
       .from('board_permissions')
       .select('read_level')
       .eq('category', currentCategory)
@@ -121,7 +124,7 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
     );
   }
 
-  let query = supabase
+  let query = supabaseServer
     .from('posts')
     .select('*')
     .order('is_notice', { ascending: false })
@@ -169,8 +172,8 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                     key={post.id} 
                     className={`transition-colors duration-150 ${
                       isNotice 
-                        ? 'bg-[#F4F7FB] hover:bg-[#ECF1F7] border-l-4 border-l-[#5486B2]' 
-                        : 'hover:bg-gray-55'
+                        ? 'bg-amber-50/70 hover:bg-amber-100/50 border-l-4 border-l-amber-500 font-semibold' 
+                        : 'hover:bg-gray-50'
                     }`}
                   >
                     <Link href={`/board/${post.id}`} className="block px-6 py-5">
@@ -178,7 +181,7 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                             {isNotice && (
-                              <span className="bg-[#5486B2] text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow-sm">
+                              <span className="bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow-sm">
                                 [공지]
                               </span>
                             )}
@@ -186,22 +189,22 @@ export default async function BoardList({ searchParams }: { searchParams: Promis
                               {post.title}
                             </h2>
                           </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-500">
-                          <span className="font-medium text-gray-700">{post.author}</span>
-                          <span className="text-gray-300">|</span>
-                          <time dateTime={post.created_at}>
-                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}
-                          </time>
-                          <span className="text-gray-300">|</span>
-                          <span>조회 {post.views || 0}</span>
+                          <div className="flex items-center gap-3 text-sm text-gray-500">
+                            <span className="font-medium text-gray-700">{post.author}</span>
+                            <span className="text-gray-300">|</span>
+                            <time dateTime={post.created_at}>
+                              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}
+                            </time>
+                            <span className="text-gray-300">|</span>
+                            <span>조회 {post.views || 0}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })
-          )}
+                    </Link>
+                  </li>
+                );
+              })
+            )}
           </ul>
         </div>
       </div>

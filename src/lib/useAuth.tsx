@@ -229,6 +229,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
       setUser(loggedUser);
       localStorage.setItem('jb_session_email', loggedUser.email);
+      
+      // 세션 토큰 즉시 동기화 (onAuthStateChange의 비동기 딜레이 방지)
+      if (data.session) {
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=604800; sameSite=lax`;
+        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=2592000; sameSite=lax`;
+      }
+      
       // 백엔드 세션 호환을 위한 plain email 쿠키 설정
       document.cookie = `email=${encodeURIComponent(loggedUser.email)}; path=/; max-age=604800; sameSite=lax`;
     }
