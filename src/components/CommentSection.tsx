@@ -170,7 +170,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2.5">
                   <span className="font-bold text-sm text-[#0A103D]">
-                    {comment.users?.nickname || comment.users?.name || '익명 회원'}
+                    {comment.users?.nickname || comment.users?.name || '알 수 없음'}
                   </span>
                   <span className="text-gray-300">|</span>
                   <div className="flex items-center gap-1 text-[11px] text-gray-400 font-semibold">

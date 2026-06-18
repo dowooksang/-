@@ -132,6 +132,29 @@ export default function AdminMembersPage() {
     }
   };
 
+  const handleKick = async (userId: string) => {
+    if (!confirm('정말로 이 회원을 강제 탈퇴 처리하시겠습니까? 계정과 관련 DB 정보가 영구적으로 파괴됩니다.')) return;
+    
+    try {
+      const res = await fetch('/api/admin/members/kick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      
+      if (res.ok) {
+        alert('해당 회원이 성공적으로 강제 탈퇴(Kick) 처리되었습니다.');
+        fetchMembers();
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(`강제 탈퇴 처리 실패: ${data.error || '알 수 없는 오류'}`);
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
   if (!isLoaded || isLoading) {
     return <div className="text-center py-20 text-gray-500 font-semibold text-lg">로딩 중...</div>;
   }
@@ -240,12 +263,20 @@ export default function AdminMembersPage() {
                       {new Date(m.created_at).toLocaleDateString()}
                     </td>
                     <td className="p-5 text-center">
-                      <button 
-                        onClick={() => handleApprove(m.id)}
-                        className="bg-blue-700 text-white text-base font-black px-6 py-3 rounded-lg shadow-md hover:bg-blue-800 hover:-translate-y-[1px] transition-all"
-                      >
-                        승인
-                      </button>
+                      <div className="flex items-center justify-center gap-3">
+                        <button 
+                          onClick={() => handleApprove(m.id)}
+                          className="bg-blue-700 text-white text-base font-black px-6 py-3 rounded-lg shadow-md hover:bg-blue-800 hover:-translate-y-[1px] transition-all"
+                        >
+                          승인
+                        </button>
+                        <button 
+                          onClick={() => handleKick(m.id)}
+                          className="bg-red-600 text-white text-base font-black px-6 py-3 rounded-lg shadow-md hover:bg-red-700 hover:-translate-y-[1px] transition-all"
+                        >
+                          강제 탈퇴
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -354,9 +385,19 @@ export default function AdminMembersPage() {
                           {user?.level === UserLevel.LV6_CEO && m.level === UserLevel.LV5_ADMIN && (
                             <button 
                               onClick={() => handleDismiss(m.id)}
-                              className="bg-red-600 text-white text-sm font-black px-4 py-2.5 rounded-lg shadow-md hover:bg-red-700 hover:-translate-y-[1px] transition-all"
+                              className="bg-amber-600 text-white text-sm font-black px-4 py-2.5 rounded-lg shadow-md hover:bg-amber-700 hover:-translate-y-[1px] transition-all"
                             >
                               해임
+                            </button>
+                          )}
+
+                          {/* 강제 탈퇴 버튼: 로그인한 관리자의 등급이 대상 회원보다 높은 경우에만 활성화 */}
+                          {user?.level !== undefined && user.level > m.level && (
+                            <button 
+                              onClick={() => handleKick(m.id)}
+                              className="bg-red-600 text-white text-sm font-black px-4 py-2.5 rounded-lg shadow-md hover:bg-red-700 hover:-translate-y-[1px] transition-all"
+                            >
+                              강제 탈퇴
                             </button>
                           )}
                         </div>

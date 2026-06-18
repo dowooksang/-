@@ -180,7 +180,7 @@ export default async function BranchCouncilPage() {
                             </h3>
                           </div>
                           <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
-                            <span className="text-slate-700 font-bold">{post.author}</span>
+                            <span className="text-slate-700 font-bold">{post.author_id ? post.author : '알 수 없음'}</span>
                             <span className="text-gray-300">|</span>
                             <time dateTime={post.created_at}>
                               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}

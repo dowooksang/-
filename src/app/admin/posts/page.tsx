@@ -205,7 +205,7 @@ export default function AdminPosts() {
                     <td className="p-4 font-medium text-gray-800">
                       {post.title}
                     </td>
-                    <td className="p-4 text-sm text-gray-600">{post.author}</td>
+                    <td className="p-4 text-sm text-gray-600">{post.author_id ? post.author : '알 수 없음'}</td>
                     <td className="p-4 text-sm text-gray-500">
                       {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}
                     </td>

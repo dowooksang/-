@@ -113,7 +113,7 @@ export default async function RequestPage() {
                           </h3>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-500 mt-2">
-                          <span className="font-medium text-gray-700">{post.author}</span>
+                          <span className="font-medium text-gray-700">{post.author_id ? post.author : '알 수 없음'}</span>
                           <span className="text-gray-300">|</span>
                           <time dateTime={post.created_at}>
                             {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}

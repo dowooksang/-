@@ -55,7 +55,7 @@ export default async function BranchRecruitPage() {
                         {post.title}
                       </Link>
                     </td>
-                    <td className="p-4 text-sm text-gray-600 text-center">{post.author}</td>
+                    <td className="p-4 text-sm text-gray-600 text-center">{post.author_id ? post.author : '알 수 없음'}</td>
                     <td className="p-4 text-sm text-gray-500 text-center">
                       {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}
                     </td>

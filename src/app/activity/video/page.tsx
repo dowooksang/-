@@ -328,7 +328,7 @@ export default function VideoPage() {
                     <div className="flex items-center justify-between text-xs text-gray-400 border-t border-white/5 pt-4">
                       <div className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-accent" />
-                        <span className="font-semibold text-gray-200">{post.author}</span>
+                        <span className="font-semibold text-gray-200">{post.author_id ? post.author : '알 수 없음'}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5" />

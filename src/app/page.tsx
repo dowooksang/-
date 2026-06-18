@@ -253,7 +253,7 @@ export default async function Home() {
                     </h3>
                   </div>
                   <div className="flex flex-col items-end hidden sm:flex text-right">
-                    <span className="text-xs font-medium text-neutral-600">{post.author}</span>
+                    <span className="text-xs font-medium text-neutral-600">{post.author_id ? post.author : '알 수 없음'}</span>
                     <span className="text-[10px] text-neutral-400">{formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })}</span>
                   </div>
                 </Link>

@@ -150,7 +150,7 @@ export default function CommunityPage() {
                             {post.title}
                           </Link>
                         </td>
-                        <td className="py-4 px-4 text-center text-sm text-gray-700 truncate max-w-[120px]">{post.author}</td>
+                        <td className="py-4 px-4 text-center text-sm text-gray-700 truncate max-w-[120px]">{post.author_id ? post.author : '알 수 없음'}</td>
                         <td className="py-4 px-4 text-center text-sm text-gray-500">
                           {new Date(post.created_at).toLocaleDateString()}
                         </td>

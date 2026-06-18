@@ -26,6 +26,30 @@ export default function MyPageEdit() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  const handleWithdraw = async () => {
+    setIsWithdrawing(true);
+    try {
+      const res = await fetch('/api/auth/withdraw', {
+        method: 'POST',
+      });
+      if (res.ok) {
+        alert('회원 탈퇴가 완료되었습니다. 그동안 이용해 주셔서 감사합니다.');
+        window.location.href = '/';
+      } else {
+        const data = await res.json();
+        alert(`회원 탈퇴 실패: ${data.error || '알 수 없는 오류'}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('회원 탈퇴 처리 중 오류가 발생했습니다.');
+    } finally {
+      setIsWithdrawing(false);
+      setIsConfirmModalOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -177,6 +201,52 @@ export default function MyPageEdit() {
             </button>
           </div>
         </form>
+
+        {/* 회원 탈퇴 (Danger Zone) */}
+        <div className="mt-8 bg-red-50 rounded-2xl shadow-sm border border-red-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h4 className="text-base font-bold text-red-700">위험 구역 (Danger Zone)</h4>
+            <p className="text-gray-500 text-xs mt-1">회원 탈퇴 시 즉시 로그아웃되며 계정 정보가 완전히 삭제됩니다. 단, 작성하신 글과 댓글은 유지됩니다.</p>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setIsConfirmModalOpen(true)}
+            className="px-5 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-red-700 transition-colors whitespace-nowrap"
+          >
+            회원 탈퇴
+          </button>
+        </div>
+
+        {/* 회원 탈퇴 경고 모달 */}
+        {isConfirmModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-100 animate-fade-in text-black">
+              <h3 className="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">⚠️ 회원 탈퇴 경고</h3>
+              <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                <strong>정말로 탈퇴하시겠습니까? 모든 정보가 삭제됩니다.</strong><br/>
+                탈퇴 시 기존 계정은 완전히 파기되며 복구할 수 없습니다. 작성하신 게시글과 댓글은 삭제되지 않고 보존됩니다.
+              </p>
+              <div className="flex justify-end gap-3 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmModalOpen(false)}
+                  disabled={isWithdrawing}
+                  className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleWithdraw}
+                  disabled={isWithdrawing}
+                  className="px-5 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-red-700 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isWithdrawing ? '탈퇴 처리 중...' : '탈퇴하기'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
