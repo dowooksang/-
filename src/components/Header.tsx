@@ -42,16 +42,6 @@ export default function Header() {
         { href: '/solo/debut', label: '무대 데뷔 신청', icon: '🎤' }
       ]
     },
-    { 
-      href: '/branch', 
-      label: '전국 지부',
-      subItems: [
-        { href: '/branch/recruitment', label: '지부 모집 및 신청', icon: '📝' },
-        { href: '/branch/map', label: '전국 지부 현황', icon: '🗺️' },
-        { href: '/branch/news', label: '지부별 활동 소식', icon: '📰' },
-        { href: '/branch/council', label: '지부장 회의실', icon: '🤝' }
-      ]
-    },
     {  
       href: '/community', 
       label: '커뮤니티',
@@ -80,6 +70,16 @@ export default function Header() {
         { href: '/share/gallery', label: '재능기부/봉사 기록', icon: '📸' },
         { href: '/share/sponsor', label: '후원 및 협찬 안내', icon: '💝' },
         { href: '/share/request', label: '봉사 요청하기', icon: '🙌' }
+      ]
+    },
+    { 
+      href: '/branch', 
+      label: '전국 지부',
+      subItems: [
+        { href: '/branch/recruitment', label: '지부 모집 및 신청', icon: '📝' },
+        { href: '/branch/map', label: '전국 지부 현황', icon: '🗺️' },
+        { href: '/branch/news', label: '지부별 활동 소식', icon: '📰' },
+        { href: '/branch/council', label: '지부장 회의실', icon: '🤝' }
       ]
     },
   ];
