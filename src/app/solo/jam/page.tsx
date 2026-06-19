@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/useAuth';
 import { UserLevel } from '@/lib/store';
 import { supabase } from '@/lib/supabaseClient';
@@ -17,11 +18,10 @@ function getYoutubeId(url: string): string | null {
 
 export default function JamPage() {
   const { user, isLoaded } = useAuth();
+  const router = useRouter();
   const [writeLevel, setWriteLevel] = useState<number | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<any>(null);
   
   // 업로드 관련 상태
   const [uploadType, setUploadType] = useState<'youtube' | 'direct'>('youtube');
@@ -191,17 +191,9 @@ export default function JamPage() {
 
       alert('영상이 정상적으로 삭제되었습니다.');
       fetchVideos();
-      if (selectedVideo?.id === videoId) {
-        setIsPlayerModalOpen(false);
-      }
     } catch (err: any) {
       alert(`삭제 중 오류 발생: ${err.message}`);
     }
-  };
-
-  const openPlayer = (video: any) => {
-    setSelectedVideo(video);
-    setIsPlayerModalOpen(true);
   };
 
   if (!isLoaded || writeLevel === null) {
@@ -282,7 +274,7 @@ export default function JamPage() {
             <p className="text-sm text-gray-500 mt-2">첫 번째로 방구석 음악 대장의 위엄을 보여주세요!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             {videos.map((video) => {
               const youtubeId = getYoutubeId(video.video_url);
               const isYoutube = !!youtubeId;
@@ -293,7 +285,7 @@ export default function JamPage() {
               return (
                 <div 
                   key={video.id} 
-                  onClick={() => openPlayer(video)}
+                  onClick={() => router.push(`/solo/jam/${video.id}`)}
                   className="bg-white/5 border border-white/10 hover:border-accent/40 rounded-2xl overflow-hidden transition-all duration-300 backdrop-blur-md flex flex-col shadow-xl cursor-pointer group hover:shadow-[0_8px_30px_rgba(130,200,255,0.15)] relative"
                 >
                   {/* 카드 썸네일 영역 */}
@@ -506,76 +498,6 @@ export default function JamPage() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* 비디오 재생 모달 창 */}
-      {isPlayerModalOpen && selectedVideo && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-[#0D154A] border border-white/10 rounded-2xl w-full max-w-4xl overflow-hidden relative shadow-2xl">
-            <button 
-              onClick={() => setIsPlayerModalOpen(false)}
-              className="absolute top-4 right-4 text-white hover:text-accent transition-colors p-2 rounded-full bg-black/60 backdrop-blur-md hover:scale-105 z-50 cursor-pointer"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            {/* 비디오 플레이어 영역 */}
-            <div className="relative aspect-video w-full bg-black">
-              {selectedVideo.video_url && selectedVideo.video_url.includes('youtube.com/embed') ? (
-                <iframe
-                  src={`${selectedVideo.video_url}?autoplay=1`}
-                  title={selectedVideo.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
-              ) : selectedVideo.video_url ? (
-                <video 
-                  src={selectedVideo.video_url} 
-                  controls 
-                  autoPlay 
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-500">
-                  <AlertCircle className="w-12 h-12 mb-2" />
-                  <span>비디오 경로를 확인할 수 없습니다.</span>
-                </div>
-              )}
-            </div>
-
-            {/* 비디오 하단 텍스트 정보 */}
-            <div className="p-8">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 pb-4 border-b border-white/5">
-                <div>
-                  <h2 className="text-2xl font-black text-white tracking-tight">{selectedVideo.title}</h2>
-                  <div className="flex items-center gap-3 text-xs text-gray-400 mt-2">
-                    <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-accent" /> {selectedVideo.author}</span>
-                    <span>|</span>
-                    <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {new Date(selectedVideo.created_at).toLocaleDateString()}</span>
-                  </div>
-                </div>
-
-                {user && (user.id === selectedVideo.author_id || (user.level ?? 0) >= UserLevel.LV5_ADMIN) && (
-                  <button 
-                    onClick={(e) => handleDelete(e, selectedVideo.id, selectedVideo.video_url)}
-                    className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    삭제하기
-                  </button>
-                )}
-              </div>
-
-              <div className="bg-black/30 p-4.5 rounded-xl border border-white/5">
-                <p className="text-sm text-gray-200 leading-relaxed font-medium whitespace-pre-line">
-                  {selectedVideo.content}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       )}
