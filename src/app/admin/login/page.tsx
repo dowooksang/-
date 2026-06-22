@@ -26,8 +26,7 @@ export default function AdminLoginPage() {
       // useAuth의 login 함수가 내부적으로 supabase.auth.signInWithPassword를 호출합니다.
       await login(form.email, form.password);
 
-      // 강제 이동 (router.replace + window.location.href)
-      router.replace('/admin/dashboard');
+      // 강제 이동 (소프트 라우팅을 생략하고 즉시 하드 리다이렉션)
       window.location.href = '/admin/dashboard';
     } catch (err: any) {
       await logout();

@@ -22,9 +22,8 @@ export default function LoginPage() {
       // useAuth의 login 함수가 내부적으로 supabase.auth.signInWithPassword를 호출합니다.
       await login(formData.email, formData.password);
       
-      // 로그인 성공 → 즉시 세션 반영을 위한 refresh 후 메인으로 실시간 이동
-      router.refresh();
-      router.push('/');
+      // 로그인 성공 → 즉시 세션 반영을 위해 소프트 라우팅 대신 하드 리로드로 메인 이동
+      window.location.href = '/';
     } catch (err: any) {
       console.error('Login error:', err);
       // 로그인 실패 시 세션 완전 파괴

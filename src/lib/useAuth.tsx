@@ -192,6 +192,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=604800; sameSite=lax`;
         document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=2592000; sameSite=lax`;
         document.cookie = `email=${encodeURIComponent(email)}; path=/; max-age=604800; sameSite=lax`;
+
+        // SIGNED_IN 이벤트 발생 시, 로그인 페이지라면(OAuth 등 대비) 하드 리다이렉션으로 세션 동기화
+        if (_event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.pathname === '/login') {
+          window.location.href = '/';
+        }
       } else {
         setUser(null);
         // 세션 해제 시 쿠키 파기
@@ -273,6 +278,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     } catch (cookieErr) {
       console.error('클라이언트 쿠키 수동 삭제 실패:', cookieErr);
+    }
+
+    // 로그아웃 시 전체 브라우저를 깨끗하게 새로고침하며 강제 이동
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
     }
   };
 
