@@ -193,9 +193,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=2592000; sameSite=lax`;
         document.cookie = `email=${encodeURIComponent(email)}; path=/; max-age=604800; sameSite=lax`;
 
-        // SIGNED_IN 이벤트 발생 시, 로그인 페이지라면(OAuth 등 대비) 하드 리다이렉션으로 세션 동기화
-        if (_event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.pathname === '/login') {
-          window.location.href = '/';
+        // SIGNED_IN 이벤트 발생 시, 로그인 관련 페이지에 있다면 확실하게 하드 리다이렉션으로 세션 동기화
+        if (_event === 'SIGNED_IN' && typeof window !== 'undefined') {
+          if (window.location.pathname === '/login') {
+            window.location.href = '/';
+          } else if (window.location.pathname === '/admin/login') {
+            window.location.href = '/admin/dashboard';
+          }
         }
       } else {
         setUser(null);

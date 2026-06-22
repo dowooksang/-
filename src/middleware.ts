@@ -1,10 +1,79 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export function middleware() {
-  // 🚨 경호원 전원 해고! 묻지도 따지지도 않고 무조건 통과!
-  return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  // 1. 응답 객체 생성
+  const response = NextResponse.next();
+
+  // 2. 환경 변수 검증
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  if (!supabaseUrl || !supabaseKey) {
+    return response;
+  }
+
+  // 3. 브라우저 쿠키로부터 세션 토큰 읽기
+  const accessToken = request.cookies.get('sb-access-token')?.value;
+  const refreshToken = request.cookies.get('sb-refresh-token')?.value;
+
+  if (accessToken && refreshToken) {
+    // 4. 격리된 Supabase 클라이언트 임시 생성 (미들웨어용)
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+
+    try {
+      // 5. Supabase 세션 설정 및 체크
+      const { data: { session }, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+
+      // 6. 세션이 유효하고, 갱신되었거나 정상인 경우 쿠키를 다시 구워 동기화 보장
+      if (!error && session) {
+        // 기존 쿠키와 비교하여 변경되었거나, 브라우저 세션 유지를 위해 재설정
+        response.cookies.set('sb-access-token', session.access_token, {
+          path: '/',
+          maxAge: 604800, // 7일
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
+        });
+        response.cookies.set('sb-refresh-token', session.refresh_token, {
+          path: '/',
+          maxAge: 2592000, // 30일
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
+        });
+        if (session.user?.email) {
+          response.cookies.set('email', encodeURIComponent(session.user.email), {
+            path: '/',
+            maxAge: 604800,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+          });
+        }
+      } else if (error) {
+        // 만약 세션 복구에 실패한 경우(토큰 만료 등), 기존 세션 쿠키 삭제하여 동기화
+        response.cookies.delete('sb-access-token');
+        response.cookies.delete('sb-refresh-token');
+        response.cookies.delete('email');
+      }
+    } catch (e) {
+      console.error('Middleware session refresh error:', e);
+    }
+  }
+
+  return response;
 }
 
+// matcher 설정: 정적 리소스 및 파비콘 등을 제외한 전역 경로에 미들웨어 작동 보장
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
