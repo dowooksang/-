@@ -14,9 +14,22 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  const pathname = request.nextUrl.pathname;
+
+  // /super/storage는 /admin/vault로 302 리다이렉션 처리
+  if (pathname === '/super/storage') {
+    return NextResponse.redirect(new URL('/admin/vault', request.url));
+  }
+
+  const isAdminMeeting = pathname.startsWith('/admin/meeting');
+  const isAdminVault = pathname.startsWith('/admin/vault');
+
   // 3. 브라우저 쿠키로부터 세션 토큰 읽기
   const accessToken = request.cookies.get('sb-access-token')?.value;
   const refreshToken = request.cookies.get('sb-refresh-token')?.value;
+
+  let sessionUser: any = null;
+  let userLevel: number = 0;
 
   if (accessToken && refreshToken) {
     // 4. 격리된 Supabase 클라이언트 임시 생성 (미들웨어용)
@@ -36,7 +49,8 @@ export async function middleware(request: NextRequest) {
 
       // 6. 세션이 유효하고, 갱신되었거나 정상인 경우 쿠키를 다시 구워 동기화 보장
       if (!error && session) {
-        // 기존 쿠키와 비교하여 변경되었거나, 브라우저 세션 유지를 위해 재설정
+        sessionUser = session.user;
+
         response.cookies.set('sb-access-token', session.access_token, {
           path: '/',
           maxAge: 604800, // 7일
@@ -57,6 +71,19 @@ export async function middleware(request: NextRequest) {
             secure: process.env.NODE_ENV === 'production',
           });
         }
+
+        // 특정 관리자 전용 경로 접근 시에만 유저 등급(Level) 추가 체크 수행
+        if (isAdminMeeting || isAdminVault) {
+          const { data: dbUser, error: dbError } = await supabase
+            .from('users')
+            .select('level')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!dbError && dbUser) {
+            userLevel = dbUser.level ?? 1;
+          }
+        }
       } else if (error) {
         // 만약 세션 복구에 실패한 경우(토큰 만료 등), 기존 세션 쿠키 삭제하여 동기화
         response.cookies.delete('sb-access-token');
@@ -64,7 +91,24 @@ export async function middleware(request: NextRequest) {
         response.cookies.delete('email');
       }
     } catch (e) {
-      console.error('Middleware session refresh error:', e);
+      console.error('Middleware session refresh/check error:', e);
+    }
+  }
+
+  // 7. 특정 보안 공간 권한 통제 (이중 보안 1단계)
+  if (isAdminMeeting || isAdminVault) {
+    let isAuthorized = false;
+    if (sessionUser) {
+      if (isAdminMeeting && userLevel >= 5) {
+        isAuthorized = true;
+      } else if (isAdminVault && userLevel === 6) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      // 비인가 권한의 경우 메인 화면으로 리다이렉트
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 

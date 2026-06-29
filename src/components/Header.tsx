@@ -99,7 +99,7 @@ export default function Header() {
       href: '/admin',
       label: '[시스템 관리자 전용]',
       subItems: [
-        { href: '/admin/dashboard', label: '워드프레스 대시보드 바로가기', icon: '⚙️' },
+        { href: '/admin/dashboard', label: '대시보드 바로가기', icon: '⚙️' },
         { href: '/admin/members', label: '회원 목록 및 가입 승인', icon: '👥' },
         { href: '/admin/posts', label: '망보드 게시물 통합 관리', icon: '📝' },
         { href: '/admin/branches', label: '지부 가입 신청 현황 확인', icon: '🏢' },
@@ -165,6 +165,24 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-4">
           {isLoaded && user ? (
             <div className="flex items-center gap-4">
+              {/* 비밀 공간 바로가기 버튼 (조건부 렌더링 - DOM 흔적도 없이 숨김) */}
+              {user.level !== undefined && user.level >= UserLevel.LV5_ADMIN && (
+                <Link 
+                  href="/admin/meeting"
+                  className="bg-[#0b1329] border border-cyan-500/30 text-cyan-400 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-cyan-500/10 hover:border-cyan-400 transition-all flex items-center gap-1 shadow-[0_0_10px_rgba(34,211,238,0.15)]"
+                >
+                  <span>🗣️ 작전실</span>
+                </Link>
+              )}
+              {user.level !== undefined && user.level === UserLevel.LV6_CEO && (
+                <Link 
+                  href="/admin/vault"
+                  className="bg-[#130f05] border border-amber-500/30 text-amber-400 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-amber-500/10 hover:border-amber-400 transition-all flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                >
+                  <span>🔐 비밀금고</span>
+                </Link>
+              )}
+
               <Link href="/mypage" className="text-sm flex items-center hover:opacity-80 transition-opacity">
                 <span className="text-slate-700 mr-2 font-medium underline-offset-4 hover:underline">{user.name || user.nickname}님</span>
                 <span className="bg-slate-200/50 text-accent px-2 py-1 rounded text-xs border border-slate-300">
@@ -262,6 +280,27 @@ export default function Header() {
                     {getLevelName(user.level)}
                   </span>
                 </Link>
+
+                {/* 모바일 비밀 바로가기 버튼 (조건부 렌더링 - DOM 흔적도 없이 숨김) */}
+                {user.level !== undefined && user.level >= UserLevel.LV5_ADMIN && (
+                  <Link 
+                    href="/admin/meeting"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 text-sm font-bold bg-[#0b1329] border border-cyan-500/30 text-cyan-400 py-3.5 rounded-xl hover:bg-cyan-500/10 transition-colors shadow-inner"
+                  >
+                    <span>🗣️ 운영진 작전 회의실</span>
+                  </Link>
+                )}
+                {user.level !== undefined && user.level === UserLevel.LV6_CEO && (
+                  <Link 
+                    href="/admin/vault"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 text-sm font-bold bg-[#130f05] border border-amber-500/30 text-amber-400 py-3.5 rounded-xl hover:bg-amber-500/10 transition-colors shadow-inner"
+                  >
+                    <span>🔐 최고관리자 비밀 금고</span>
+                  </Link>
+                )}
+
                 <button 
                   onClick={logout}
                   className="w-full flex items-center justify-center gap-2 text-base font-bold bg-white/10 text-white py-4 rounded-xl hover:bg-white/20 transition-colors"
